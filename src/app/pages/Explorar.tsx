@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Search, MapPin, Check, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { MOCK_PROPERTIES } from '../data/properties';
+import { useProperties } from '../hooks/useProperties';
 import { PropertyCard } from '../components/PropertyCard';
 import * as Slider from '@radix-ui/react-slider';
 
 export function Explorar() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { properties, loading } = useProperties();
   
   // Leitura de TODOS os parâmetros da URL
   const pretensaoParam = searchParams.get('pretensao');
@@ -158,7 +159,7 @@ export function Explorar() {
     'vilaolimpia': 'Vila Olímpia'
   };
 
-  const filteredProperties = MOCK_PROPERTIES.filter(prop => {
+  const filteredProperties = (properties || []).filter(prop => {
     const matchesSearch = !searchText || 
       prop.title.toLowerCase().includes(searchText.toLowerCase()) ||
       prop.neighborhood.toLowerCase().includes(searchText.toLowerCase());

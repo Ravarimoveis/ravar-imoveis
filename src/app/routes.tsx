@@ -5,6 +5,7 @@ import { Explorar } from './pages/Explorar';
 import { PropertyDetail } from './pages/PropertyDetail';
 import { Anunciar } from './pages/Anunciar';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
 import Setup from './pages/Setup';
 
 export const router = createBrowserRouter([
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
         element: <Admin />,
       },
       {
+        path: "admin/login",
+        element: <AdminLogin />,
+      },
+      {
         path: "setup",
         element: <Setup />,
       },
@@ -42,7 +47,7 @@ export const router = createBrowserRouter([
           <div className="pt-32 pb-24 text-center min-h-screen flex items-center justify-center">
             <div>
               <h1 className="text-4xl font-extralight text-[#0A1929] mb-4">404</h1>
-              <p className="text-[#0A1929]/60 font-light">Página não encontrada</p>
+              <p className="text-[#0A1929]/60 font-light">Página n��o encontrada</p>
             </div>
           </div>
         ),

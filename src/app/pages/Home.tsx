@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Search, MapPin, SlidersHorizontal, Minus, ChevronDown, Check, ChevronLeft, ChevronRight, ShieldCheck, Award, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { MOCK_PROPERTIES, NEIGHBORHOOD_PAGES } from '../data/properties';
+import { NEIGHBORHOOD_PAGES } from '../data/properties';
+import { useProperties } from '../hooks/useProperties';
 import { PropertyCard } from '../components/PropertyCard';
 import { Waves, Building2, Droplets, Dog, Train, Wine, Briefcase, UtensilsCrossed, Smartphone, Key, Home as HomeIcon, TreePine } from 'lucide-react';
 import * as Slider from '@radix-ui/react-slider';
 
 export function Home() {
   const navigate = useNavigate();
+  const { properties, loading } = useProperties();
   const [searchTab, setSearchTab] = useState('Comprar');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [neighborhoodPage, setNeighborhoodPage] = useState(0);
@@ -449,9 +451,9 @@ export function Home() {
                           )}
                         </div>
                         
-                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━��━━━━━━━━━━━━━━━━ */}
+                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                         {/* COLUNA 3: CARACTERÍSTICAS (Scrollable)              */}
-                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                         <div className="space-y-6 text-left max-h-[500px] overflow-y-auto pr-2">
                           {/* INFRAESTRUTURA */}
                           <div>
@@ -579,9 +581,19 @@ export function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 text-left">
-            {MOCK_PROPERTIES.map(prop => (
-              <PropertyCard key={prop.id} prop={prop} onNavigate={() => navigate(`/imovel/${prop.id}`)} />
-            ))}
+            {loading ? (
+              <div className="col-span-full text-center py-20">
+                <p className="text-[#0A1929]/60">Carregando imóveis...</p>
+              </div>
+            ) : properties && properties.length > 0 ? (
+              properties.map(prop => (
+                <PropertyCard key={prop.id} prop={prop} onNavigate={() => navigate(`/imovel/${prop.id}`)} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20">
+                <p className="text-[#0A1929]/60">Nenhum imóvel encontrado.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

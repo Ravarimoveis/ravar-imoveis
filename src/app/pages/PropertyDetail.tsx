@@ -2,20 +2,34 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { MapPin, BedDouble, Bath, Car, Square, Minus, CheckCircle2, ShieldCheck, Dog, Phone, Calendar, Image as ImageIcon, Play, Coffee, PlusSquare, Fuel, ShoppingBag } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
-import { MOCK_PROPERTIES, formatCurrency } from '../data/properties';
+import { formatCurrency } from '../data/properties';
+import { useProperties } from '../hooks/useProperties';
 
 export function PropertyDetail() {
   const { id } = useParams();
-  const property = MOCK_PROPERTIES.find(p => p.id === id);
+  const { properties, loading } = useProperties();
+  const property = properties.find(p => p.id === id);
   const [selectedImage, setSelectedImage] = useState(0);
 
   // Scroll to top quando abrir a página
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="pt-32 pb-24 min-h-screen flex items-center justify-center">
+        <p className="text-[#0A1929]/60">Carregando imóvel...</p>
+      </div>
+    );
+  }
 
   if (!property) {
-    return <div className="pt-32 pb-24 text-center">Imóvel não encontrado</div>;
+    return (
+      <div className="pt-32 pb-24 min-h-screen flex items-center justify-center">
+        <p className="text-[#0A1929]/60">Imóvel não encontrado</p>
+      </div>
+    );
   }
 
   const isAluguel = property.type === 'Aluguel';
@@ -134,15 +148,6 @@ export function PropertyDetail() {
                 <h3 className="text-xl font-extralight text-[#0A1929] uppercase tracking-[0.4em]">Diferenciais & Facilidades</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
-                {property.conveniences?.map((item) => (
-                  <div key={item.id} className="flex items-center gap-6 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
-                     <div className="text-[#AF9042] group-hover:scale-110 transition-transform">{item.icon}</div>
-                     <div>
-                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#0A1929]">{item.label}</p>
-                       <p className="text-[11px] font-light text-[#0A1929]/60 italic">{item.desc}</p>
-                     </div>
-                  </div>
-                ))}
                 <div className="flex items-center gap-6 p-8 border border-gray-100 rounded-sm group">
                    <Dog size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
                    <div>
@@ -157,17 +162,22 @@ export function PropertyDetail() {
                 <h3 className="text-xl font-extralight text-[#0A1929] uppercase tracking-[0.4em]">Vida no Entorno</h3>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-24 text-center">
-                {[
-                  {icon:<Coffee size={24}/>,label:"Padarias"},
-                  {icon:<PlusSquare size={24}/>,label:"Farmácias"},
-                  {icon:<Fuel size={24}/>,label:"Postos"},
-                  {icon:<ShoppingBag size={24}/>,label:"Mercados"}
-                ].map((item, idx) => (
-                  <div key={idx} className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
-                     <div className="text-[#AF9042] group-hover:scale-110 transition-transform">{item.icon}</div>
-                     <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">{item.label}</span>
-                  </div>
-                ))}
+                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                   <Coffee size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Padarias</span>
+                </div>
+                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                   <PlusSquare size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Farmácias</span>
+                </div>
+                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                   <Fuel size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Postos</span>
+                </div>
+                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                   <ShoppingBag size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Mercados</span>
+                </div>
               </div>
 
               <div className="h-[450px] bg-slate-100 rounded-sm relative overflow-hidden grayscale hover:grayscale-0 transition-all duration-[3s]">
