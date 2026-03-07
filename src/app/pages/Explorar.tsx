@@ -10,6 +10,9 @@ export function Explorar() {
   const [searchParams] = useSearchParams();
   const { properties, loading } = useProperties();
   
+  console.log('🔥 EXPLORAR - Properties loaded:', properties?.length, 'properties');
+  console.log('🔥 EXPLORAR - All properties:', properties);
+  
   // Leitura de TODOS os parâmetros da URL
   const pretensaoParam = searchParams.get('pretensao');
   const searchParam = searchParams.get('search');
@@ -33,28 +36,28 @@ export function Explorar() {
   
   // Inicializa states com valores da URL se existirem
   const [searchText, setSearchText] = useState(searchParam || '');
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false); // ✅ FECHA POR PADRÃO
   const [searchTab, setSearchTab] = useState(
     pretensaoParam === 'comprar' ? 'Comprar' :
-    pretensaoParam === 'alugar' ? 'Alugar' : 'Comprar'
+    pretensaoParam === 'alugar' ? 'Alugar' : 'Todos' // ✅ INICIA COMO "TODOS"
   );
   const [filterType, setFilterType] = useState(
-    tipoParam ? tipoParam.charAt(0).toUpperCase() + tipoParam.slice(1) : 'Apartamento'
+    tipoParam ? tipoParam.charAt(0).toUpperCase() + tipoParam.slice(1) : 'Todos'
   );
-  const [filterRooms, setFilterRooms] = useState(roomsParam || '2+');
+  const [filterRooms, setFilterRooms] = useState(roomsParam || 'Todos');
   const [filterBathrooms, setFilterBathrooms] = useState(bathroomsParam || 'Todos');
   
   // Range Sliders com 2 thumbs
   const [areaRange, setAreaRange] = useState<number[]>([
-    minAreaParam ? parseInt(minAreaParam) : 50,
-    maxAreaParam ? parseInt(maxAreaParam) : 800
+    minAreaParam ? parseInt(minAreaParam) : 0,
+    maxAreaParam ? parseInt(maxAreaParam) : 1000
   ]);
   const [priceRange, setPriceRange] = useState<number[]>([
-    minPriceParam ? parseInt(minPriceParam) : 300000,
+    minPriceParam ? parseInt(minPriceParam) : 0,
     maxPriceParam ? parseInt(maxPriceParam) : 50000000
   ]);
   const [rentRange, setRentRange] = useState<number[]>([
-    minRentParam ? parseInt(minRentParam) : 2000,
+    minRentParam ? parseInt(minRentParam) : 0,
     maxRentParam ? parseInt(maxRentParam) : 150000
   ]);
   
@@ -109,6 +112,33 @@ export function Explorar() {
     );
   };
 
+  // ✅ FUNÇÃO PARA LIMPAR TODOS OS FILTROS
+  const clearAllFilters = () => {
+    setSearchText('');
+    setSearchTab('Todos');
+    setFilterType('Todos');
+    setFilterRooms('Todos');
+    setFilterBathrooms('Todos');
+    setAreaRange([0, 1000]);
+    setPriceRange([0, 50000000]);
+    setRentRange([0, 150000]);
+    setIncludeCondominium(false);
+    setFilterInfraestrutura([]);
+    setFilterImovel([]);
+    setFilterDiferenciais([]);
+    setFilterProximidade([]);
+    setFilterNeighborhoods([]);
+    console.log('🧹 Todos os filtros foram limpos!');
+  };
+
+  // ✅ FUNÇÃO DO BOTÃO LUPA - Foca nos resultados
+  const handleSearch = () => {
+    console.log('🔍 Buscando com filtros aplicados...');
+    setIsFiltersOpen(false);
+    // Scroll suave até os resultados
+    window.scrollTo({ top: 600, behavior: 'smooth' });
+  };
+
   const availableNeighborhoods = [
     { id: 'itaim', name: 'Itaim Bibi' },
     { id: 'jardins', name: 'Jardins' },
@@ -118,7 +148,8 @@ export function Explorar() {
     { id: 'higienopolis', name: 'Higienópolis' },
     { id: 'brooklin', name: 'Brooklin' },
     { id: 'alto', name: 'Alto de Pinheiros' },
-    { id: 'vilaolimpia', name: 'Vila Olímpia' }
+    { id: 'vilaolimpia', name: 'Vila Olímpia' },
+    { id: 'cidadejardim', name: 'Cidade Jardim' }
   ];
 
   // 4 CATEGORIAS PADRONIZADAS
@@ -146,7 +177,7 @@ export function Explorar() {
     'Padarias', 'Farmácias', 'Postos', 'Mercados'
   ];
 
-  // Mapeamento de IDs de bairro para nomes completos
+  // Map bairro IDs to names
   const neighborhoodMap: Record<string, string> = {
     'itaim': 'Itaim Bibi',
     'jardins': 'Jardins',
@@ -156,52 +187,92 @@ export function Explorar() {
     'higienopolis': 'Higienópolis',
     'brooklin': 'Brooklin',
     'alto': 'Alto de Pinheiros',
-    'vilaolimpia': 'Vila Olímpia'
+    'vilaolimpia': 'Vila Olímpia',
+    'cidadejardim': 'Cidade Jardim'
   };
 
   const filteredProperties = (properties || []).filter(prop => {
-    const matchesSearch = !searchText || 
+    // Log para debug
+    console.log('🔍 Filtering property:', prop.title, {
+      type: prop.type,
+      category: prop.category,
+      neighborhood: prop.neighborhood,
+      rooms: prop.rooms,
+      baths: prop.baths,
+      price: prop.price,
+      area: prop.area
+    });
+
+    // ✅ BUSCA POR TEXTO - Só aplica se houver texto
+    const matchesSearch = !searchText || searchText.trim() === '' ||
       prop.title.toLowerCase().includes(searchText.toLowerCase()) ||
       prop.neighborhood.toLowerCase().includes(searchText.toLowerCase());
     
-    const matchesTab = searchTab === 'Comprar' ? prop.type === 'Venda' : 
+    // ✅ PRETENSÃO - Só aplica se não for "Todos"
+    const matchesTab = searchTab === 'Todos' ? true :
+                       searchTab === 'Comprar' ? prop.type === 'Venda' : 
                        searchTab === 'Alugar' ? prop.type === 'Aluguel' : true;
 
-    const matchesType = filterType === 'Apartamento' || filterType === prop.category || true;
+    // ✅ TIPO - Só aplica se não for "Todos"
+    const matchesType = filterType === 'Todos' ? true : filterType === prop.category;
 
-    const matchesRooms = filterRooms === '2+' ? prop.rooms >= 2 :
+    // ✅ QUARTOS - Só aplica se não for "Todos"
+    const matchesRooms = filterRooms === 'Todos' ? true :
                          filterRooms === '1+' ? prop.rooms >= 1 :
+                         filterRooms === '2+' ? prop.rooms >= 2 :
                          filterRooms === '3+' ? prop.rooms >= 3 :
                          filterRooms === '4+' ? prop.rooms >= 4 : true;
 
+    // ✅ BANHEIROS - Só aplica se não for "Todos"
     const matchesBathrooms = filterBathrooms === 'Todos' ? true :
                              filterBathrooms === '1+' ? prop.baths >= 1 :
                              filterBathrooms === '2+' ? prop.baths >= 2 :
                              filterBathrooms === '3+' ? prop.baths >= 3 :
                              filterBathrooms === '4+' ? prop.baths >= 4 : true;
 
-    const matchesPrice = searchTab === 'Comprar' ? 
+    // ✅ PREÇO - Só aplica se for "Comprar" E o range não estiver no máximo
+    const matchesPrice = searchTab === 'Comprar' && (priceRange[0] > 0 || priceRange[1] < 50000000) ?
                          (prop.price >= priceRange[0] && prop.price <= priceRange[1]) : true;
     
-    const matchesRent = searchTab === 'Alugar' ? 
+    // ✅ ALUGUEL - Só aplica se for "Alugar" E o range não estiver no máximo
+    const matchesRent = searchTab === 'Alugar' && (rentRange[0] > 0 || rentRange[1] < 150000) ?
                         (prop.price >= rentRange[0] && prop.price <= rentRange[1]) : true;
     
-    const matchesArea = prop.area >= areaRange[0] && prop.area <= areaRange[1];
+    // ✅ ÁREA - Só aplica se o range não estiver no máximo
+    const matchesArea = (areaRange[0] > 0 || areaRange[1] < 1000) ?
+                        (prop.area >= areaRange[0] && prop.area <= areaRange[1]) : true;
 
-    // Filtro de bairro único via URL parameter
+    // ✅ BAIRRO ÚNICO - Via URL parameter
     const matchesSingleBairro = !bairroParam || prop.neighborhood === neighborhoodMap[bairroParam];
 
-    // Filtro de múltiplos bairros
+    // ✅ MÚLTIPLOS BAIRROS - Só aplica se houver seleção
     let matchesMultipleBairros = true;
     if (filterNeighborhoods.length > 0) {
       const selectedBairros = filterNeighborhoods.map(id => neighborhoodMap[id]);
       matchesMultipleBairros = selectedBairros.includes(prop.neighborhood);
     }
 
-    // Filtro de categoria via URL parameter (usando premiumTags)
+    // ✅ CATEGORIA - Via URL parameter
     const matchesCategoria = !categoriaParam || (prop.premiumTags && prop.premiumTags.includes(categoriaParam));
 
-    return matchesSearch && matchesTab && matchesType && matchesRooms && matchesBathrooms && matchesPrice && matchesRent && matchesArea && matchesSingleBairro && matchesMultipleBairros && matchesCategoria;
+    const result = matchesSearch && matchesTab && matchesType && matchesRooms && matchesBathrooms && matchesPrice && matchesRent && matchesArea && matchesSingleBairro && matchesMultipleBairros && matchesCategoria;
+    
+    console.log('✅ Matches:', {
+      matchesSearch,
+      matchesTab,
+      matchesType,
+      matchesRooms,
+      matchesBathrooms,
+      matchesPrice,
+      matchesRent,
+      matchesArea,
+      matchesSingleBairro,
+      matchesMultipleBairros,
+      matchesCategoria,
+      RESULT: result
+    });
+
+    return result;
   });
 
   // Formatação de valores
@@ -242,6 +313,16 @@ export function Explorar() {
           <p className="text-[#0A1929]/60 font-light text-[15px] tracking-wider uppercase">
             {filteredProperties.length} {filteredProperties.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
           </p>
+          
+          {/* ✅ BOTÃO LIMPAR FILTROS */}
+          {(searchText || searchTab !== 'Todos' || filterType !== 'Todos' || filterRooms !== 'Todos' || filterBathrooms !== 'Todos' || filterNeighborhoods.length > 0) && (
+            <button 
+              onClick={clearAllFilters}
+              className="mt-4 px-6 py-2 border-2 border-[#AF9042] text-[#AF9042] rounded-full text-[10px] uppercase tracking-widest hover:bg-[#AF9042] hover:text-white transition-all"
+            >
+              🧹 Limpar Todos os Filtros
+            </button>
+          )}
         </div>
 
         {/* Barra de Busca + Filtros */}
@@ -276,7 +357,7 @@ export function Explorar() {
               <span>Filtros</span> 
               <ChevronDown size={12} className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`} />
             </button>
-            <button className="bg-[#AF9042] text-white p-4 rounded-full hover:bg-white hover:text-[#0A1929] hover:border hover:border-[#AF9042] transition-all transform hover:scale-105 shadow-xl">
+            <button className="bg-[#AF9042] text-white p-4 rounded-full hover:bg-white hover:text-[#0A1929] hover:border hover:border-[#AF9042] transition-all transform hover:scale-105 shadow-xl" onClick={handleSearch}>
               <Search size={22} strokeWidth={1.5} />
             </button>
           </div>
@@ -311,7 +392,7 @@ export function Explorar() {
                     <div>
                       <span className="text-[9px] uppercase tracking-[0.3em] text-[#AF9042] font-bold block mb-4 italic">Tipo de Imóvel</span>
                       <div className="grid grid-cols-2 gap-2">
-                        {['Apartamento', 'Casa', 'Condomínio', 'Loft'].map(t => (
+                        {['Todos', 'Apartamento', 'Casa', 'Condomínio', 'Loft'].map(t => (
                           <button 
                             key={t} 
                             onClick={() => setFilterType(t)} 
@@ -326,8 +407,8 @@ export function Explorar() {
                     {/* Quartos */}
                     <div>
                       <span className="text-[9px] uppercase tracking-[0.3em] text-[#AF9042] font-bold block mb-4 italic">Quartos</span>
-                      <div className="grid grid-cols-4 gap-2">
-                        {['1+', '2+', '3+', '4+'].map(r => (
+                      <div className="grid grid-cols-5 gap-2">
+                        {['Todos', '1+', '2+', '3+', '4+'].map(r => (
                           <button 
                             key={r} 
                             onClick={() => setFilterRooms(r)} 
@@ -516,7 +597,7 @@ export function Explorar() {
                   
                   {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                   {/* COLUNA 4: LOCALIZAÇÃO (Scrollable)                  */}
-                  {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+                  {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                   <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2 border-l border-gray-50 pl-6">
                     {/* BAIRROS */}
                     <div>

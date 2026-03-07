@@ -42,12 +42,8 @@ export default function AdminSections() {
 
   const loadConfig = async () => {
     try {
-      const token = localStorage.getItem('admin_access_token');
-      const response = await fetch(`${API_BASE}/sections/config`, {
-        headers: {
-          'X-Admin-Token': token || ''
-        }
-      });
+      // No auth required for GET - public endpoint
+      const response = await fetch(`${API_BASE}/sections/config`);
 
       if (response.ok) {
         const data = await response.json();
@@ -66,16 +62,40 @@ export default function AdminSections() {
     setSaving(true);
     try {
       const token = localStorage.getItem('admin_access_token');
+      
+      console.log('========================================');
+      console.log('=== SAVING SECTIONS CONFIG ===');
+      console.log('Token from localStorage:', token);
+      console.log('Config to save:', config);
+      console.log('========================================');
+      
+      if (!token) {
+        toast.error('Token não encontrado. Faça login novamente.');
+        navigate('/admin/login');
+        return;
+      }
+      
+      // IMPORTANT: We need TWO levels of auth:
+      // 1. Authorization header with publicAnonKey (for Supabase Edge Functions)
+      // 2. Admin token in body (for our server code)
       const response = await fetch(`${API_BASE}/sections/config`, {
         method: 'POST',
         headers: {
-          'X-Admin-Token': token || '',
+          'Authorization': `Bearer ${publicAnonKey}`,  // For Supabase Edge Functions
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ config })
+        body: JSON.stringify({ 
+          token,  // Admin token for our server code
+          config
+        })
       });
 
+      console.log('Response status:', response.status);
+      
       const result = await response.json();
+      
+      console.log('Response data:', result);
+      console.log('========================================');
 
       if (response.ok && result.success) {
         toast.success('Configurações salvas com sucesso!');
@@ -105,7 +125,7 @@ export default function AdminSections() {
           <Button
             onClick={() => navigate('/admin')}
             variant="outline"
-            className="border-gray-700 hover:bg-gray-800 text-white mb-4"
+            className="border-[#AF9042] hover:bg-[#AF9042] text-[#AF9042] hover:text-white mb-4 transition-all"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar para Imóveis
@@ -124,7 +144,7 @@ export default function AdminSections() {
               </div>
               <Button
                 onClick={() => setConfig({ ...config, neighborhoodsEnabled: !config.neighborhoodsEnabled })}
-                className={`${
+                className={`text-white transition-all ${
                   config.neighborhoodsEnabled 
                     ? 'bg-green-600 hover:bg-green-700' 
                     : 'bg-gray-600 hover:bg-gray-700'
@@ -146,19 +166,19 @@ export default function AdminSections() {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="neighborhoodsTitle">Título da Seção</Label>
+                <Label htmlFor="neighborhoodsTitle" className="text-gray-300 mb-2 block">Título da Seção</Label>
                 <Input
                   id="neighborhoodsTitle"
                   value={config.neighborhoodsTitle}
                   onChange={(e) => setConfig({ ...config, neighborhoodsTitle: e.target.value })}
                   placeholder="Ex: Explore por bairros"
-                  className="bg-[#0A1929] border-gray-700"
+                  className="bg-[#0A1929] border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
 
               <div className="bg-[#0A1929] p-4 rounded border border-gray-700">
-                <p className="text-sm text-gray-400 mb-2">💡 <strong>Nota:</strong></p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-300 mb-2">💡 <strong className="text-[#AF9042]">Nota:</strong></p>
+                <p className="text-xs text-gray-400 leading-relaxed">
                   As fotos e bairros são configurados diretamente no código (Home.tsx).
                   Para editar os bairros disponíveis, fotos e links de filtro, você precisa
                   modificar o array NEIGHBORHOOD_PAGES no arquivo /src/app/pages/Home.tsx
@@ -176,7 +196,7 @@ export default function AdminSections() {
               </div>
               <Button
                 onClick={() => setConfig({ ...config, categoriesEnabled: !config.categoriesEnabled })}
-                className={`${
+                className={`text-white transition-all ${
                   config.categoriesEnabled 
                     ? 'bg-green-600 hover:bg-green-700' 
                     : 'bg-gray-600 hover:bg-gray-700'
@@ -198,19 +218,19 @@ export default function AdminSections() {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="categoriesTitle">Título da Seção</Label>
+                <Label htmlFor="categoriesTitle" className="text-gray-300 mb-2 block">Título da Seção</Label>
                 <Input
                   id="categoriesTitle"
                   value={config.categoriesTitle}
                   onChange={(e) => setConfig({ ...config, categoriesTitle: e.target.value })}
                   placeholder="Ex: Buscar por Categoria"
-                  className="bg-[#0A1929] border-gray-700"
+                  className="bg-[#0A1929] border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
 
               <div className="bg-[#0A1929] p-4 rounded border border-gray-700">
-                <p className="text-sm text-gray-400 mb-2">💡 <strong>Nota:</strong></p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-300 mb-2">💡 <strong className="text-[#AF9042]">Nota:</strong></p>
+                <p className="text-xs text-gray-400 leading-relaxed">
                   As fotos e categorias são configuradas diretamente no código (Home.tsx).
                   Para editar as categorias disponíveis, fotos, ícones e filtros, você precisa
                   modificar o array categoryPages no arquivo /src/app/pages/Home.tsx
@@ -224,7 +244,7 @@ export default function AdminSections() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-[#AF9042] hover:bg-[#8f7635] text-white px-8"
+              className="bg-[#AF9042] hover:bg-[#8f7635] text-white px-8 transition-all"
             >
               {saving ? (
                 <>

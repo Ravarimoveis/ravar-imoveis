@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, MapPin, SlidersHorizontal, Minus, ChevronDown, Check, ChevronLeft, ChevronRight, ShieldCheck, Award, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NEIGHBORHOOD_PAGES } from '../data/properties';
@@ -6,6 +6,16 @@ import { useProperties } from '../hooks/useProperties';
 import { PropertyCard } from '../components/PropertyCard';
 import { Waves, Building2, Droplets, Dog, Train, Wine, Briefcase, UtensilsCrossed, Smartphone, Key, Home as HomeIcon, TreePine } from 'lucide-react';
 import * as Slider from '@radix-ui/react-slider';
+import { projectId, publicAnonKey } from '/utils/supabase/info';
+
+const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-e68c254a`;
+
+interface SectionConfig {
+  neighborhoodsEnabled: boolean;
+  neighborhoodsTitle: string;
+  categoriesEnabled: boolean;
+  categoriesTitle: string;
+}
 
 export function Home() {
   const navigate = useNavigate();
@@ -17,6 +27,14 @@ export function Home() {
   const [filterType, setFilterType] = useState('Apartamento');
   const [filterRooms, setFilterRooms] = useState('2+');
   const [filterBathrooms, setFilterBathrooms] = useState('Todos');
+  
+  // Sections config from admin
+  const [sectionsConfig, setSectionsConfig] = useState<SectionConfig>({
+    neighborhoodsEnabled: true,
+    neighborhoodsTitle: 'Explore por bairros',
+    categoriesEnabled: true,
+    categoriesTitle: 'Buscar por Categoria'
+  });
   
   // Range Sliders com 2 thumbs
   const [areaRange, setAreaRange] = useState<number[]>([50, 800]);
@@ -35,6 +53,34 @@ export function Home() {
   const [filterProximidade, setFilterProximidade] = useState<string[]>([]);
   const [filterNeighborhoods, setFilterNeighborhoods] = useState<string[]>([]);
   const [searchText, setSearchText] = useState('');
+
+  // Load sections config on mount
+  useEffect(() => {
+    loadSectionsConfig();
+  }, []);
+
+  const loadSectionsConfig = async () => {
+    try {
+      console.log('🔄 Loading sections config from backend...');
+      const response = await fetch(`${API_BASE}/sections/config`, {
+        headers: {
+          'Authorization': `Bearer ${publicAnonKey}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Sections config loaded:', data);
+        if (data.success && data.config) {
+          setSectionsConfig(data.config);
+          console.log('✅ Sections config applied:', data.config);
+        }
+      } else {
+        console.log('❌ Failed to load config, status:', response.status);
+      }
+    } catch (error) {
+      console.log('❌ Could not load sections config, using defaults:', error);
+    }
+  };
 
   // Toggle functions
   const toggleInfraestrutura = (item: string) => {
@@ -118,7 +164,8 @@ export function Home() {
     { id: 'higienopolis', name: 'Higienópolis' },
     { id: 'brooklin', name: 'Brooklin' },
     { id: 'alto', name: 'Alto de Pinheiros' },
-    { id: 'vilaolimpia', name: 'Vila Olímpia' }
+    { id: 'vilaolimpia', name: 'Vila Olímpia' },
+    { id: 'cidadejardim', name: 'Cidade Jardim' }
   ];
 
   // 4 CATEGORIAS PADRONIZADAS
@@ -599,123 +646,127 @@ export function Home() {
       </section>
 
       {/* EXPLORAR POR BAIRROS */}
-      <section className="py-32 bg-white border-t border-gray-50 text-center">
-        <div className="container mx-auto px-10">
-          <div className="flex flex-col items-center text-center mb-16">
-            <h2 className="text-3xl font-extralight text-[#0A1929] uppercase tracking-[0.4em] mb-4 text-center">Explore por bairros</h2>
-            <Minus className="text-[#AF9042]" />
-          </div>
-          <div className="relative text-left">
-            <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px] animate-in fade-in duration-700 text-left">
-              {NEIGHBORHOOD_PAGES[neighborhoodPage].map((b) => (
-                <div 
-                  key={b.id} 
-                  onClick={() => navigate(`/explorar?bairro=${b.id}`)}
-                  className={`relative group overflow-hidden rounded-sm cursor-pointer shadow-lg text-left ${
-                    b.size === 'large' ? 'md:col-span-2 md:row-span-2' : 
-                    b.size === 'medium' ? 'md:col-span-2 md:row-span-1' : 
-                    'md:col-span-1 md:row-span-1'
-                  }`}
-                >
-                  <img 
-                    src={b.img} 
-                    className="w-full h-full object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
-                    alt={b.name} 
-                  />
-                  <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8 text-left">
-                    <span className="text-[#AF9042] text-[10px] font-light uppercase tracking-[0.4em] text-left">Explorar</span>
-                    <h3 className="text-white text-3xl font-extralight tracking-widest uppercase">{b.name}</h3>
-                  </div>
-                </div>
-              ))}
+      {sectionsConfig.neighborhoodsEnabled && (
+        <section className="py-32 bg-white border-t border-gray-50 text-center">
+          <div className="container mx-auto px-10">
+            <div className="flex flex-col items-center text-center mb-16">
+              <h2 className="text-3xl font-extralight text-[#0A1929] uppercase tracking-[0.4em] mb-4 text-center">{sectionsConfig.neighborhoodsTitle}</h2>
+              <Minus className="text-[#AF9042]" />
             </div>
-            <div className="absolute top-1/2 -left-6 -translate-y-1/2 z-10 text-left">
-              <button 
-                onClick={() => setNeighborhoodPage(prev => Math.max(0, prev - 1))} 
-                className={`p-4 bg-white shadow-xl rounded-full transition-all text-left ${neighborhoodPage === 0 ? 'opacity-20' : 'hover:scale-110'}`} 
-                disabled={neighborhoodPage === 0}
-              >
-                <ChevronLeft size={20} className="text-[#AF9042]" />
-              </button>
-            </div>
-            <div className="absolute top-1/2 -right-6 -translate-y-1/2 z-10 text-left">
-              <button 
-                onClick={() => setNeighborhoodPage(prev => Math.min(2, prev + 1))} 
-                className={`p-4 bg-white shadow-xl rounded-full transition-all text-left ${neighborhoodPage === 2 ? 'opacity-20' : 'hover:scale-110'}`} 
-                disabled={neighborhoodPage === 2}
-              >
-                <ChevronRight size={20} className="text-[#AF9042]" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BUSCAR POR CATEGORIA */}
-      <section className="py-32 bg-[#F8F8F8] text-center">
-        <div className="container mx-auto px-10">
-          <div className="flex flex-col items-center text-center mb-16">
-            <h2 className="text-3xl font-extralight text-[#0A1929] uppercase tracking-[0.4em] mb-4">Buscar por Categoria</h2>
-            <Minus className="text-[#AF9042]" />
-          </div>
-          <div className="relative">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-700">
-              {categoryPages[categoryPage].map((cat) => (
-                <div 
-                  key={cat.id} 
-                  onClick={() => handleCategoryClick(cat.filter)}
-                  className="relative h-80 overflow-hidden rounded-sm cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-700 group"
-                >
-                  <img 
-                    src={cat.img} 
-                    className="w-full h-full object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
-                    alt={cat.name} 
-                  />
-                  <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8 text-left">
-                    <div className="inline-flex items-center gap-2.5 bg-[#0A1929]/90 backdrop-blur-sm px-4 py-2.5 rounded-md w-fit">
-                      {cat.icon}
-                      <h3 className="text-white text-sm font-extralight tracking-widest uppercase group-hover:text-[#AF9042] transition-colors duration-500">
-                        {cat.name}
-                      </h3>
+            <div className="relative text-left">
+              <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px] animate-in fade-in duration-700 text-left">
+                {NEIGHBORHOOD_PAGES[neighborhoodPage].map((b) => (
+                  <div 
+                    key={b.id} 
+                    onClick={() => navigate(`/explorar?bairro=${b.id}`)}
+                    className={`relative group overflow-hidden rounded-sm cursor-pointer shadow-lg text-left ${
+                      b.size === 'large' ? 'md:col-span-2 md:row-span-2' : 
+                      b.size === 'medium' ? 'md:col-span-2 md:row-span-1' : 
+                      'md:col-span-1 md:row-span-1'
+                    }`}
+                  >
+                    <img 
+                      src={b.img} 
+                      className="w-full h-full object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                      alt={b.name} 
+                    />
+                    <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8 text-left">
+                      <span className="text-[#AF9042] text-[10px] font-light uppercase tracking-[0.4em] text-left">Explorar</span>
+                      <h3 className="text-white text-3xl font-extralight tracking-widest uppercase">{b.name}</h3>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="absolute top-1/2 -left-6 -translate-y-1/2 z-10">
-              <button 
-                onClick={() => setCategoryPage(0)} 
-                className={`p-4 bg-white shadow-xl rounded-full transition-all ${categoryPage === 0 ? 'opacity-20' : 'hover:scale-110 hover:bg-[#AF9042] hover:text-white'}`} 
-                disabled={categoryPage === 0}
-              >
-                <ChevronLeft size={20} className={categoryPage === 0 ? 'text-gray-300' : 'text-[#AF9042]'} />
-              </button>
-            </div>
-            <div className="absolute top-1/2 -right-6 -translate-y-1/2 z-10">
-              <button 
-                onClick={() => setCategoryPage(1)} 
-                className={`p-4 bg-white shadow-xl rounded-full transition-all ${categoryPage === 1 ? 'opacity-20' : 'hover:scale-110 hover:bg-[#AF9042] hover:text-white'}`} 
-                disabled={categoryPage === 1}
-              >
-                <ChevronRight size={20} className={categoryPage === 1 ? 'text-gray-300' : 'text-[#AF9042]'} />
-              </button>
-            </div>
-
-            <div className="flex justify-center gap-2 mt-12">
-              {[0, 1].map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCategoryPage(page)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    categoryPage === page ? 'w-12 bg-[#AF9042]' : 'w-6 bg-gray-300 hover:bg-[#AF9042]/50'
-                  }`}
-                />
-              ))}
+                ))}
+              </div>
+              <div className="absolute top-1/2 -left-6 -translate-y-1/2 z-10 text-left">
+                <button 
+                  onClick={() => setNeighborhoodPage(prev => Math.max(0, prev - 1))} 
+                  className={`p-4 bg-white shadow-xl rounded-full transition-all text-left ${neighborhoodPage === 0 ? 'opacity-20' : 'hover:scale-110'}`} 
+                  disabled={neighborhoodPage === 0}
+                >
+                  <ChevronLeft size={20} className="text-[#AF9042]" />
+                </button>
+              </div>
+              <div className="absolute top-1/2 -right-6 -translate-y-1/2 z-10 text-left">
+                <button 
+                  onClick={() => setNeighborhoodPage(prev => Math.min(2, prev + 1))} 
+                  className={`p-4 bg-white shadow-xl rounded-full transition-all text-left ${neighborhoodPage === 2 ? 'opacity-20' : 'hover:scale-110'}`} 
+                  disabled={neighborhoodPage === 2}
+                >
+                  <ChevronRight size={20} className="text-[#AF9042]" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* BUSCAR POR CATEGORIA */}
+      {sectionsConfig.categoriesEnabled && (
+        <section className="py-32 bg-[#F8F8F8] text-center">
+          <div className="container mx-auto px-10">
+            <div className="flex flex-col items-center text-center mb-16">
+              <h2 className="text-3xl font-extralight text-[#0A1929] uppercase tracking-[0.4em] mb-4">{sectionsConfig.categoriesTitle}</h2>
+              <Minus className="text-[#AF9042]" />
+            </div>
+            <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-700">
+                {categoryPages[categoryPage].map((cat) => (
+                  <div 
+                    key={cat.id} 
+                    onClick={() => handleCategoryClick(cat.filter)}
+                    className="relative h-80 overflow-hidden rounded-sm cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-700 group"
+                  >
+                    <img 
+                      src={cat.img} 
+                      className="w-full h-full object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                      alt={cat.name} 
+                    />
+                    <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8 text-left">
+                      <div className="inline-flex items-center gap-2.5 bg-[#0A1929]/90 backdrop-blur-sm px-4 py-2.5 rounded-md w-fit">
+                        {cat.icon}
+                        <h3 className="text-white text-sm font-extralight tracking-widest uppercase group-hover:text-[#AF9042] transition-colors duration-500">
+                          {cat.name}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="absolute top-1/2 -left-6 -translate-y-1/2 z-10">
+                <button 
+                  onClick={() => setCategoryPage(0)} 
+                  className={`p-4 bg-white shadow-xl rounded-full transition-all ${categoryPage === 0 ? 'opacity-20' : 'hover:scale-110 hover:bg-[#AF9042] hover:text-white'}`} 
+                  disabled={categoryPage === 0}
+                >
+                  <ChevronLeft size={20} className={categoryPage === 0 ? 'text-gray-300' : 'text-[#AF9042]'} />
+                </button>
+              </div>
+              <div className="absolute top-1/2 -right-6 -translate-y-1/2 z-10">
+                <button 
+                  onClick={() => setCategoryPage(1)} 
+                  className={`p-4 bg-white shadow-xl rounded-full transition-all ${categoryPage === 1 ? 'opacity-20' : 'hover:scale-110 hover:bg-[#AF9042] hover:text-white'}`} 
+                  disabled={categoryPage === 1}
+                >
+                  <ChevronRight size={20} className={categoryPage === 1 ? 'text-gray-300' : 'text-[#AF9042]'} />
+                </button>
+              </div>
+
+              <div className="flex justify-center gap-2 mt-12">
+                {[0, 1].map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCategoryPage(page)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      categoryPage === page ? 'w-12 bg-[#AF9042]' : 'w-6 bg-gray-300 hover:bg-[#AF9042]/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* VALORES RAVA */}
       <section className="py-24 bg-[#0A1929] text-white">

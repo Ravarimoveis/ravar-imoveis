@@ -503,4 +503,95 @@ app.delete("/make-server-e68c254a/properties/cleanup/mock-data", async (c) => {
   }
 });
 
+// ==================== SECTIONS CONFIG ENDPOINTS ====================
+
+// GET sections config (PUBLIC - no auth required)
+app.get("/make-server-e68c254a/sections/config", async (c) => {
+  try {
+    // Get config from KV store (no auth required for reading)
+    const config = await kv.get('sections:config');
+    
+    // Return config or default values
+    return c.json({ 
+      success: true, 
+      config: config || {
+        neighborhoodsEnabled: true,
+        neighborhoodsTitle: 'Explore por bairros',
+        categoriesEnabled: true,
+        categoriesTitle: 'Buscar por Categoria'
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching sections config:', error);
+    return c.json({ success: false, error: String(error) }, 500);
+  }
+});
+
+// POST/PUT sections config (REQUIRES AUTH via body - same pattern as /admin/verify)
+app.post("/make-server-e68c254a/sections/config", async (c) => {
+  console.log('========================================');
+  console.log('=== SECTIONS CONFIG POST REQUEST ===');
+  console.log('========================================');
+  
+  try {
+    // Get token from BODY (not headers) to avoid CORS issues
+    const body = await c.req.json();
+    const accessToken = body.token;
+    const config = body.config;
+    
+    console.log('Token from body:', accessToken ? 'Present' : 'Missing');
+    console.log('Config from body:', config ? 'Present' : 'Missing');
+    
+    if (!accessToken) {
+      console.log('❌ No token provided in body');
+      return c.json({ success: false, error: 'Não autorizado - Token ausente' }, 401);
+    }
+
+    if (!config) {
+      console.log('❌ No config in body');
+      return c.json({ success: false, error: 'Config is required' }, 400);
+    }
+
+    // Verify admin user (same pattern as /admin/verify)
+    let email: string;
+    try {
+      const parts = accessToken.split(':');
+      email = parts[0];
+      console.log('✅ Token split successful - Email:', email);
+    } catch (err) {
+      console.log('❌ Error splitting token:', err);
+      return c.json({ success: false, error: 'Token inválido' }, 401);
+    }
+
+    const emailLower = email.toLowerCase();
+    console.log('Looking up user:', emailLower);
+    
+    const user = ADMIN_USERS[emailLower as keyof typeof ADMIN_USERS];
+    
+    if (!user) {
+      console.log('❌ User not found in ADMIN_USERS');
+      return c.json({ success: false, error: 'Acesso não autorizado' }, 403);
+    }
+
+    console.log('✅ User authenticated:', user.name);
+
+    // Save config to KV store
+    await kv.set('sections:config', config);
+    
+    console.log('✅ Config saved successfully!');
+    console.log('Saved config:', JSON.stringify(config, null, 2));
+    console.log('========================================');
+    
+    return c.json({ 
+      success: true, 
+      message: 'Configurações salvas com sucesso',
+      config
+    });
+  } catch (error) {
+    console.error('❌ Error saving sections config:', error);
+    console.log('========================================');
+    return c.json({ success: false, error: String(error) }, 500);
+  }
+});
+
 Deno.serve(app.fetch);
