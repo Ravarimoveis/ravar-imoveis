@@ -1,9 +1,23 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
-import { MapPin, BedDouble, Bath, Car, Square, Minus, CheckCircle2, ShieldCheck, Dog, Phone, Calendar, Image as ImageIcon, Play, Coffee, PlusSquare, Fuel, ShoppingBag } from 'lucide-react';
+import { 
+  MapPin, BedDouble, Bath, Car, Square, Minus, CheckCircle2, ShieldCheck, 
+  Dog, Phone, Calendar, Image as ImageIcon, Play, Coffee, PlusSquare, Fuel, ShoppingBag,
+  Home, Building, Waves, Dumbbell, Users, Baby, Bike, Wifi, Wind, Droplets, Trees,
+  Camera, Sparkles, Sun, Mountain, Zap, UtensilsCrossed, GraduationCap, Hospital,
+  Bus, Train, Plane, Building2, Church, Film, Music, Landmark
+} from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { formatCurrency } from '../data/properties';
 import { useProperties } from '../hooks/useProperties';
+
+// Map icon names to actual icon components
+const iconMap: { [key: string]: any } = {
+  Dog, Home, Building, Car, Waves, Dumbbell, Users, Baby, Bike, Wifi, Wind, Droplets, 
+  Trees, ShieldCheck, Camera, Sparkles, Sun, Mountain, MapPin, Zap,
+  Coffee, ShoppingBag, PlusSquare, Fuel, UtensilsCrossed, GraduationCap, Hospital,
+  Bus, Train, Plane, Building2, Church, Film, Music, Landmark
+};
 
 export function PropertyDetail() {
   const { id } = useParams();
@@ -37,9 +51,14 @@ export function PropertyDetail() {
   const hasGallery = property.images && property.images.length > 0;
   const displayImages = hasGallery ? property.images : [property.image];
 
-  const openWhatsApp = () => {
-    const msg = encodeURIComponent(`Olá, vi o imóvel "${property.title}" (Ref: ${property.id}) no site da Ravar Imóveis e gostaria de agendar uma consulta.`);
-    window.open(`https://api.whatsapp.com/send?phone=5511999999999&text=${msg}`, '_blank');
+  const openWhatsAppInfo = () => {
+    const msg = encodeURIComponent(`Olá! Vi o imóvel *${property.title}* (Ref: ${property.id}) no site da RAVAR Imóveis e gostaria de saber mais informações sobre este imóvel. Aguardo retorno!`);
+    window.open(`https://api.whatsapp.com/send?phone=5511972013159&text=${msg}`, '_blank');
+  };
+
+  const openWhatsAppSchedule = () => {
+    const msg = encodeURIComponent(`Olá! Vi o imóvel *${property.title}* (Ref: ${property.id}) no site da RAVAR Imóveis e gostei muito! Gostaria de agendar uma visita para conhecer pessoalmente. Quando podemos agendar?`);
+    window.open(`https://api.whatsapp.com/send?phone=5511972013159&text=${msg}`, '_blank');
   };
 
   return (
@@ -148,13 +167,28 @@ export function PropertyDetail() {
                 <h3 className="text-xl font-extralight text-[#0A1929] uppercase tracking-[0.4em]">Diferenciais & Facilidades</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
-                <div className="flex items-center gap-6 p-8 border border-gray-100 rounded-sm group">
-                   <Dog size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
-                   <div>
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#0A1929]">Pet Friendly</p>
-                     <p className="text-[11px] font-light text-[#0A1929]/60 italic">{property.petPolicy}</p>
-                   </div>
-                </div>
+                {/* Render conveniences dynamically */}
+                {property.conveniences && property.conveniences.length > 0 && property.conveniences.map((conv) => {
+                  const IconComponent = iconMap[conv.icon] || Dog;
+                  return (
+                    <div key={conv.id} className="flex items-center gap-6 p-8 border border-gray-100 rounded-sm group">
+                       <IconComponent size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                       <div>
+                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#0A1929]">{conv.label}</p>
+                         <p className="text-[11px] font-light text-[#0A1929]/60 italic">{conv.desc}</p>
+                       </div>
+                    </div>
+                  );
+                })}
+
+                {/* Fallback message if no conveniences */}
+                {(!property.conveniences || property.conveniences.length === 0) && (
+                  <div className="col-span-2 text-center py-8">
+                    <p className="text-[11px] font-light text-[#0A1929]/40 italic">
+                      Nenhum diferencial cadastrado para este imóvel
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-6 mb-10">
@@ -162,22 +196,38 @@ export function PropertyDetail() {
                 <h3 className="text-xl font-extralight text-[#0A1929] uppercase tracking-[0.4em]">Vida no Entorno</h3>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-24 text-center">
-                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
-                   <Coffee size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
-                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Padarias</span>
-                </div>
-                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
-                   <PlusSquare size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
-                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Farmácias</span>
-                </div>
-                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
-                   <Fuel size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
-                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Postos</span>
-                </div>
-                <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
-                   <ShoppingBag size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
-                   <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Mercados</span>
-                </div>
+                {/* Render lifeAround dynamically */}
+                {property.lifeAround && property.lifeAround.length > 0 ? (
+                  property.lifeAround.map((life) => {
+                    const IconComponent = iconMap[life.icon] || Coffee;
+                    return (
+                      <div key={life.id} className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                         <IconComponent size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                         <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">{life.label}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  // Fallback to default items
+                  <>
+                    <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                       <Coffee size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                       <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Padarias</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                       <PlusSquare size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                       <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Farmácias</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                       <Fuel size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                       <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Postos</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-4 p-8 border border-gray-100 rounded-sm hover:border-[#AF9042] transition-colors group">
+                       <ShoppingBag size={24} className="text-[#AF9042] group-hover:scale-110 transition-transform" />
+                       <span className="text-[10px] font-light uppercase tracking-widest text-[#0A1929]">Mercados</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="h-[450px] bg-slate-100 rounded-sm relative overflow-hidden grayscale hover:grayscale-0 transition-all duration-[3s]">
@@ -211,10 +261,10 @@ export function PropertyDetail() {
                   <p className="text-[#AF9042] text-[14px] font-light leading-tight">sobre este imóvel?</p>
                 </div>
                 <div className="space-y-6 mb-12">
-                  <button onClick={openWhatsApp} className="w-full bg-[#AF9042] text-white py-6 text-[10px] font-light uppercase tracking-[0.3em] hover:bg-white hover:text-[#0A1929] transition-all flex items-center justify-center gap-3 shadow-xl border border-[#AF9042]">
-                    <FaWhatsapp size={18} className="text-white" /> WhatsApp
+                  <button onClick={openWhatsAppInfo} className="w-full bg-[#AF9042] text-white py-6 text-[10px] font-light uppercase tracking-[0.3em] hover:bg-white hover:text-[#0A1929] transition-all flex items-center justify-center gap-3 shadow-xl border border-[#AF9042]">
+                    <FaWhatsapp size={18} /> Quero Saber Mais
                   </button>
-                  <button className="w-full border border-white/20 text-white py-6 text-[10px] font-light uppercase tracking-[0.3em] hover:bg-white/10 transition-all flex items-center justify-center gap-3">
+                  <button onClick={openWhatsAppSchedule} className="w-full border border-white/20 text-white py-6 text-[10px] font-light uppercase tracking-[0.3em] hover:bg-white/10 transition-all flex items-center justify-center gap-3">
                     <Calendar size={16} strokeWidth={1} className="text-[#AF9042]" /> Agendar Visita
                   </button>
                 </div>

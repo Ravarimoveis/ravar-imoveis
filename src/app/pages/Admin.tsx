@@ -6,11 +6,14 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Card } from '../components/ui/card';
-import { Trash2, Upload, Plus, Edit, Loader2, LogOut, RefreshCw } from 'lucide-react';
+import { Trash2, Upload, Plus, Edit, Loader2, LogOut, RefreshCw, Settings } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '../components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { ConveniencesEditor } from '../components/ConveniencesEditor';
+import { LifeAroundEditor } from '../components/LifeAroundEditor';
 import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { MOCK_PROPERTIES } from '../data/properties';
 
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-e68c254a`;
 
@@ -23,10 +26,48 @@ export default function Admin() {
   const [verifyingAuth, setVerifyingAuth] = useState(true);
   const [cleaningData, setCleaningData] = useState(false);
 
+  // FORMDATA DECLARATION - MUST BE BEFORE ANY USEEFFECT THAT USES IT
+  const [formData, setFormData] = useState<Partial<Property>>({
+    id: '',
+    title: '',
+    type: 'Venda',
+    category: 'Residencial',
+    propertyType: 'Apartamento',
+    premiumTags: [],
+    price: 0,
+    condo: 0,
+    iptu: 0,
+    area: 0,
+    landArea: 0,
+    rooms: 0,
+    suites: 0,
+    baths: 0,
+    parking: 0,
+    neighborhood: '',
+    image: '',
+    images: [],
+    description: '',
+    petPolicy: '',
+    features: [],
+    amenities: [],
+    conveniences: [],
+    lifeAround: [],
+    location_details: ''
+  });
+
   // Check authentication on mount (frontend-only)
   useEffect(() => {
     verifyAuth();
   }, []);
+
+  // Debug: Log formData changes for conveniences and lifeAround
+  useEffect(() => {
+    console.log('🔄 formData.conveniences changed:', formData.conveniences);
+  }, [formData.conveniences]);
+
+  useEffect(() => {
+    console.log('🔄 formData.lifeAround changed:', formData.lifeAround);
+  }, [formData.lifeAround]);
 
   const verifyAuth = () => {
     console.log('=== Frontend: Verifying Auth (LocalStorage) ===');
@@ -101,41 +142,51 @@ export default function Admin() {
     }
   };
 
-  const [formData, setFormData] = useState<Partial<Property>>({
-    id: '',
-    title: '',
-    type: 'Venda',
-    category: 'Residencial',
-    propertyType: 'Apartamento',
-    premiumTags: [],
-    price: 0,
-    condo: 0,
-    iptu: 0,
-    area: 0,
-    landArea: 0,
-    rooms: 0,
-    suites: 0,
-    baths: 0,
-    parking: 0,
-    neighborhood: '',
-    image: '',
-    images: [],
-    description: '',
-    petPolicy: '',
-    features: [],
-    amenities: [],
-    conveniences: [],
-    location_details: ''
-  });
-
   const handleOpenDialog = (property?: Property) => {
     console.log('=== OPENING DIALOG ===');
-    console.log('Property to edit:', JSON.stringify(property, null, 2));
+    console.log('Property to edit:', property);
     
     if (property) {
       setEditingProperty(property);
-      setFormData(property);
-      console.log('FormData set to:', JSON.stringify(property, null, 2));
+      
+      // Log raw data with detailed type checking
+      console.log('RAW property.conveniences:', property.conveniences);
+      console.log('Type of conveniences:', typeof property.conveniences);
+      console.log('Is array?', Array.isArray(property.conveniences));
+      console.log('Conveniences length:', property.conveniences?.length);
+      console.log('Conveniences JSON:', JSON.stringify(property.conveniences, null, 2));
+      
+      console.log('RAW property.lifeAround:', property.lifeAround);
+      console.log('Type of lifeAround:', typeof property.lifeAround);
+      console.log('Is array?', Array.isArray(property.lifeAround));
+      console.log('LifeAround length:', property.lifeAround?.length);
+      console.log('LifeAround JSON:', JSON.stringify(property.lifeAround, null, 2));
+      
+      // CRITICAL FIX: Deep clone and ensure proper structure
+      const formDataToSet = {
+        ...property,
+        conveniences: Array.isArray(property.conveniences) 
+          ? property.conveniences.map((item: any, idx: number) => ({
+              id: item?.id || idx + 1,
+              icon: item?.icon || 'Dog',
+              label: item?.label || '',
+              desc: item?.desc || ''
+            }))
+          : [],
+        lifeAround: Array.isArray(property.lifeAround)
+          ? property.lifeAround.map((item: any, idx: number) => ({
+              id: item?.id || idx + 1,
+              icon: item?.icon || 'ShoppingBag',
+              label: item?.label || ''
+            }))
+          : []
+      };
+      
+      console.log('FormData to set (conveniences):', JSON.stringify(formDataToSet.conveniences, null, 2));
+      console.log('FormData to set (lifeAround):', JSON.stringify(formDataToSet.lifeAround, null, 2));
+      
+      setFormData(formDataToSet);
+      console.log('✅ FormData set successfully');
     } else {
       setEditingProperty(null);
       const newFormData = {
@@ -162,6 +213,7 @@ export default function Admin() {
         features: [],
         amenities: [],
         conveniences: [],
+        lifeAround: [],
         location_details: ''
       };
       setFormData(newFormData);
@@ -249,6 +301,34 @@ export default function Admin() {
     }
   };
 
+  const handleResetToMock = async (id: string) => {
+    const mockProperty = MOCK_PROPERTIES.find(p => p.id === id);
+    
+    if (!mockProperty) {
+      toast.error('Imóvel não encontrado nos dados mockados');
+      return;
+    }
+
+    if (!confirm(`Tem certeza que deseja RESETAR o imóvel ${id} para os dados originais? Isso vai apagar todas as alterações!`)) {
+      return;
+    }
+
+    try {
+      console.log('🔄 Resetting property to MOCK data:', id);
+      console.log('MOCK data:', JSON.stringify(mockProperty, null, 2));
+      
+      await updateProperty(id, mockProperty as Property);
+      toast.success('Imóvel resetado com sucesso para dados originais!');
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error('Error resetting property:', error);
+      toast.error('Erro ao resetar imóvel');
+    }
+  };
+
   if (verifyingAuth || loading) {
     return (
       <div className="min-h-screen bg-[#0A1929] flex items-center justify-center">
@@ -258,15 +338,24 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A1929] text-white p-8">
+    <div className="dark min-h-screen bg-[#0A1929] text-white pt-24 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8 sticky top-20 bg-[#0A1929] z-40 py-4 -mx-8 px-8">
           <div>
             <h1 className="text-4xl font-bold text-[#AF9042] mb-2">Painel Administrativo RAVAR</h1>
             <p className="text-gray-400">Gerencie os imóveis do seu portfólio</p>
           </div>
           
           <div className="flex gap-3">
+            <Button 
+              onClick={() => navigate('/admin/sections')}
+              variant="outline"
+              className="border-[#AF9042] text-[#AF9042] hover:bg-[#AF9042]/10"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Gerenciar Seções
+            </Button>
+
             <Button 
               onClick={handleCleanupMockData}
               disabled={cleaningData}
@@ -288,10 +377,11 @@ export default function Admin() {
             <Button 
               onClick={handleLogout}
               variant="outline"
-              className="border-gray-700 hover:bg-gray-800 text-white"
+              className="border-gray-600 !text-white hover:bg-gray-700 hover:!text-white hover:border-gray-500"
+              style={{ color: 'white !important' }}
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sair
+              <LogOut className="w-4 h-4 mr-2" style={{ color: 'white' }} />
+              <span style={{ color: 'white' }}>Sair</span>
             </Button>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -305,7 +395,7 @@ export default function Admin() {
                 </Button>
               </DialogTrigger>
               
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0A1929] text-white border-[#AF9042]">
+              <DialogContent className="max-w-[80vw] max-h-[90vh] overflow-y-auto bg-[#0A1929] text-white border-[#AF9042]">
                 <DialogHeader>
                   <DialogTitle className="text-[#AF9042] text-2xl">
                     {editingProperty ? 'Editar Imóvel' : 'Novo Imóvel'}
@@ -315,7 +405,7 @@ export default function Admin() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6 mt-4">
                   {/* ID e Título */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -517,6 +607,96 @@ export default function Admin() {
                     />
                   </div>
 
+                  {/* Características do Imóvel (Features) */}
+                  <div>
+                    <Label htmlFor="features">Características do Imóvel</Label>
+                    <Textarea
+                      id="features"
+                      value={formData.features?.join('\n')}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        features: e.target.value.split('\n').filter(f => f.trim()) 
+                      })}
+                      placeholder="Uma característica por linha&#10;Ex:&#10;Pé direito alto&#10;Janelas amplas&#10;Closet&#10;Lavabo"
+                      className="bg-[#1a2332] border-gray-700 min-h-[120px]"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Digite uma característica por linha</p>
+                  </div>
+
+                  {/* Infraestrutura do Prédio (Amenities) */}
+                  <div>
+                    <Label htmlFor="amenities">Infraestrutura do Prédio</Label>
+                    <Textarea
+                      id="amenities"
+                      value={formData.amenities?.join('\n')}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        amenities: e.target.value.split('\n').filter(a => a.trim()) 
+                      })}
+                      placeholder="Uma amenidade por linha&#10;Ex:&#10;Piscina aquecida&#10;Academia completa&#10;Salão de festas&#10;Quadra poliesportiva"
+                      className="bg-[#1a2332] border-gray-700 min-h-[120px]"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Digite uma infraestrutura por linha</p>
+                  </div>
+
+                  {/* Diferenciais e Facilidades (Conveniences) */}
+                  <div>
+                    <Label htmlFor="conveniences">Diferenciais e Facilidades</Label>
+                    <ConveniencesEditor
+                      value={Array.isArray(formData.conveniences) ? formData.conveniences : []}
+                      onChange={(conveniences) => {
+                        console.log('=== ConveniencesEditor onChange ===');
+                        console.log('New conveniences:', JSON.stringify(conveniences, null, 2));
+                        console.log('Type:', typeof conveniences);
+                        console.log('Is Array?:', Array.isArray(conveniences));
+                        
+                        setFormData(prev => {
+                          const updated = { 
+                            ...prev, 
+                            conveniences: Array.isArray(conveniences) ? [...conveniences] : []
+                          };
+                          console.log('Updated formData.conveniences:', JSON.stringify(updated.conveniences, null, 2));
+                          return updated;
+                        });
+                      }}
+                    />
+                  </div>
+
+                  {/* Vida ao Redor (Life Around) */}
+                  <div>
+                    <Label htmlFor="lifeAround">Vida ao Redor</Label>
+                    <LifeAroundEditor
+                      value={Array.isArray(formData.lifeAround) ? formData.lifeAround : []}
+                      onChange={(lifeAround) => {
+                        console.log('=== LifeAroundEditor onChange ===');
+                        console.log('New lifeAround:', JSON.stringify(lifeAround, null, 2));
+                        console.log('Type:', typeof lifeAround);
+                        console.log('Is Array?:', Array.isArray(lifeAround));
+                        
+                        setFormData(prev => {
+                          const updated = { 
+                            ...prev, 
+                            lifeAround: Array.isArray(lifeAround) ? [...lifeAround] : []
+                          };
+                          console.log('Updated formData.lifeAround:', JSON.stringify(updated.lifeAround, null, 2));
+                          return updated;
+                        });
+                      }}
+                    />
+                  </div>
+
+                  {/* Detalhes da Localização */}
+                  <div>
+                    <Label htmlFor="location_details">Detalhes da Localização e Bairro</Label>
+                    <Textarea
+                      id="location_details"
+                      value={formData.location_details}
+                      onChange={(e) => setFormData({ ...formData, location_details: e.target.value })}
+                      placeholder="Descrição detalhada do bairro, pontos de interesse, transporte, comércio local..."
+                      className="bg-[#1a2332] border-gray-700 min-h-[100px]"
+                    />
+                  </div>
+
                   {/* Upload de Imagens */}
                   <div>
                     <Label htmlFor="images">Fotos do Imóvel</Label>
@@ -652,6 +832,14 @@ export default function Admin() {
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Deletar
+                  </Button>
+                  <Button
+                    onClick={() => handleResetToMock(property.id)}
+                    variant="outline"
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Resetar
                   </Button>
                 </div>
               </div>

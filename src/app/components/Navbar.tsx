@@ -31,9 +31,9 @@ export function Navbar() {
             ].map((item) => (
               <Link key={item.label} to={item.to} className={`text-[10px] font-light uppercase tracking-[0.3em] transition-all hover:text-[#AF9042] ${scrolled || !isHome ? 'text-[#0A1929]' : 'text-white'}`}>{item.label}</Link>
             ))}
-            <button className={`px-8 py-2.5 rounded-full text-[9px] font-light tracking-widest transition-all border ${scrolled ? 'bg-[#0A1929] text-white border-[#0A1929]' : 'bg-[#AF9042] text-white border-[#AF9042]'}`}>
+            <Link to="/contato" className={`px-8 py-2.5 rounded-full text-[9px] font-light tracking-widest transition-all border ${scrolled ? 'bg-[#0A1929] text-white border-[#0A1929] hover:bg-[#AF9042] hover:border-[#AF9042]' : 'bg-[#AF9042] text-white border-[#AF9042] hover:bg-white hover:text-[#0A1929] hover:border-[#0A1929]'}`}>
               CONTATO
-            </button>
+            </Link>
           </div>
           <button className="lg:hidden" onClick={() => setMobileMenu(true)}>
             <Menu className={scrolled || !isHome ? 'text-[#0A1929]' : 'text-white'} />
@@ -51,7 +51,8 @@ export function Navbar() {
             {label: 'Explorar', to: '/explorar'},
             {label: 'Comprar', to: '/explorar?type=venda'},
             {label: 'Alugar', to: '/explorar?type=aluguel'},
-            {label: 'Anunciar', to: '/anunciar'}
+            {label: 'Anunciar', to: '/anunciar'},
+            {label: 'Contato', to: '/contato'}
           ].map(item => (
             <Link 
               key={item.to} 

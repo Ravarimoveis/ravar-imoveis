@@ -1,5 +1,3 @@
-import { Zap, Users, Accessibility, Wifi, Archive, ShieldCheck } from 'lucide-react';
-
 // Função auxiliar para formatar moeda
 export const formatCurrency = (value: number) => {
   if (!value || value === 0) return 'Sob Consulta';
@@ -30,24 +28,9 @@ export const MOCK_PROPERTIES = [
       "https://images.unsplash.com/photo-1635111300332-47145b118f21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBtYW5zaW9uJTIwZXh0ZXJpb3IlMjBwb29sfGVufDF8fHx8MTc3MjgxMjMwOHww&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZSUyMGxpdmluZyUyMHJvb20lMjBpbnRlcmlvcnxlbnwxfHx8fDE3NzI4MTIzMDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1759223198981-661cadbbff36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtYW5zaW9uJTIwYmVkcm9vbSUyMHN1aXRlfGVufDF8fHx8MTc3MjgxMjMwOHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1769326541248-5e09a8ace25b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob21lJTIwa2l0Y2hlbiUyMGdvdXJtZXR8ZW58MXx8fHwxNzcyODEyMzA5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1721222204379-1eda0521e62d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5zaW9uJTIwc3dpbW1pbmclMjBwb29sJTIwZ2FyZGVufGVufDF8fHx8MTc3MjgxMjMwOXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1758548157466-7c454382035a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZSUyMGJhdGhyb29tJTIwbWFyYmxlfGVufDF8fHx8MTc3MjgxMjMxMHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1758795293106-104b6a2820e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtYW5zaW9uJTIwZW50cmFuY2UlMjBoYWxsfGVufDF8fHx8MTc3MjgxMjMxMHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1737233030536-247c1379d82c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob21lJTIwb2ZmaWNlJTIwaW50ZXJpb3J8ZW58MXx8fHwxNzcyODEyMzEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1671499996105-ba6261b5366b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5zaW9uJTIwZGluaW5nJTIwcm9vbSUyMGVsZWdhbnR8ZW58MXx8fHwxNzcyODEyMzExfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1517486518908-97a5f91b325f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob21lJTIwY2luZW1hJTIwdGhlYXRlcnxlbnwxfHx8fDE3NzI4MTIzMTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1724882207681-9e7e8c3dd45c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZSUyMHdpbmUlMjBjZWxsYXJ8ZW58MXx8fHwxNzcyODEyMzEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1759256243437-9c8f7238c42b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtYW5zaW9uJTIwdGVycmFjZSUyMG91dGRvb3J8ZW58MXx8fHwxNzcyODEyMzEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1622015663084-307d19eabbbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob21lJTIwZ2FyZGVuJTIwbGFuZHNjYXBpbmd8ZW58MXx8fHwxNzcyODEyMzEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1767634854859-db8255389e64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5zaW9uJTIwdGVubmlzJTIwY291cnQlMjBhZXJpYWx8ZW58MXx8fHwxNzcyODEyMzEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1704731529088-19083feb5b43?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZSUyMG1hc3RlciUyMGJhdGhyb29tfGVufDF8fHx8MTc3MjgxMjMxNHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1560598613-2ffd99a32c28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtYW5zaW9uJTIwY2xvc2V0JTIwd2FyZHJvYmV8ZW58MXx8fHwxNzcyODEyMzE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1771090904152-264a71f4fb57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob21lJTIwYmFsY29ueSUyMHZpZXd8ZW58MXx8fHwxNzcyODEyMzE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1643298058477-0185fdce86fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5zaW9uJTIwbmlnaHQlMjBleHRlcmlvciUyMGxpZ2h0c3xlbnwxfHx8fDE3NzI4MTIzMTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1706808849802-8f876ade0d1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZSUyMGZhY2FkZSUyMGFyY2hpdGVjdHVyZXxlbnwxfHx8fDE3NzI4MTIzMTV8MA&ixlib=rb-4.1.0&q=80&w=1080"
+      "https://images.unsplash.com/photo-1769326541248-5e09a8ace25b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob21lJTIwa2l0Y2hlbiUyMGdvdXJtZXR8ZW58MXx8fHwxNzcyODEyMzA5fDA&ixlib=rb-4.1.0&q=80&w=1080"
     ],
-    description: "Exclusividade absoluta no único condomínio fechado de São Paulo com terrenos de 2.000m². Esta mansão extraordinária combina privacidade, segurança e sofisticação a apenas 800 metros do Shopping Cidade Jardim. Com 1.750m² de área construída em um terreno de 2.000m², oferece infraestrutura de resort privativo com quadra de tênis, cinema, academia completa e paisagismo deslumbrante.",
+    description: "Exclusividade absoluta no único condomínio fechado de São Paulo com terrenos de 2.000m². Esta mansão extraordinária combina privacidade, segurança e sofisticação a apenas 800 metros do Shopping Cidade Jardim.",
     petPolicy: "Aceita Animais de todos os portes",
     features: [
       "Terreno 2.000m²",
@@ -74,9 +57,15 @@ export const MOCK_PROPERTIES = [
       "A 800m Shopping Cidade Jardim"
     ],
     conveniences: [
-      { id: 1, icon: <ShieldCheck size={20} />, label: "Exclusividade", desc: "Único condomínio fechado com terrenos de 2.000m² em SP" },
-      { id: 2, icon: <Zap size={20} />, label: "Localização Premium", desc: "800 metros do Shopping Cidade Jardim" },
-      { id: 3, icon: <Archive size={20} />, label: "Infraestrutura Completa", desc: "Quadra tênis, cinema, academia e salão gourmet" }
+      { id: 1, icon: 'ShieldCheck', label: "Exclusividade", desc: "Único condomínio fechado com terrenos de 2.000m² em SP" },
+      { id: 2, icon: 'MapPin', label: "Localização Premium", desc: "800 metros do Shopping Cidade Jardim" },
+      { id: 3, icon: 'Dumbbell', label: "Infraestrutura Completa", desc: "Quadra tênis, cinema, academia e salão gourmet" }
+    ],
+    lifeAround: [
+      { id: 1, icon: 'ShoppingBag', label: "Shopping Cidade Jardim" },
+      { id: 2, icon: 'UtensilsCrossed', label: "Restaurantes Premium" },
+      { id: 3, icon: 'GraduationCap', label: "Escolas de Elite" },
+      { id: 4, icon: 'Trees', label: "Parque Ibirapuera" }
     ],
     location_details: "Único condomínio fechado de São Paulo com terrenos de 2.000m², a 800m do Shopping Cidade Jardim."
   },
@@ -97,227 +86,27 @@ export const MOCK_PROPERTIES = [
     parking: 3,
     neighborhood: "Itaim Bibi",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
-    description: "Uma obra-prima de minimalismo e luz natural no coração do Itaim. Este garden privativo oferece o silêncio de uma casa com a segurança de um dos edifícios mais exclusivos de São Paulo. Com projeto assinado, apresenta marcenaria impecável e integração total entre o verde do jardim e o living social.",
+    images: ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80"],
+    description: "Uma obra-prima de minimalismo e luz natural no coração do Itaim. Este garden privativo oferece o silêncio de uma casa com a segurança de um dos edifícios mais exclusivos de São Paulo.",
     petPolicy: "Aceita Animais de grande porte",
-    features: ["Ar Condicionado Central", "Automação Lutron", "Varanda Gourmet", "Pé Direito Duplo", "Mármore Travertino", "Cozinha Gourmet", "Piso em Carvalho Francês", "Blackouts Motorizados", "Sistema de Som Integrado"],
-    amenities: ["Concierge 24h", "Piscina Aquecida", "Academia Technogym", "Spa e Sauna", "Segurança Armada", "Vagas de Visitante", "Gerador Total", "Espaço Gourmet", "Wine Lounge", "Bicicletário"],
+    features: ["Ar Condicionado Central", "Automação Lutron", "Varanda Gourmet", "Pé Direito Duplo", "Mármore Travertino", "Cozinha Gourmet"],
+    amenities: ["Concierge 24h", "Piscina Aquecida", "Academia Technogym", "Spa e Sauna", "Segurança Armada", "Vagas de Visitante"],
     conveniences: [
-      { id: 1, icon: <Zap size={20} />, label: "Carga Elétrica", desc: "Infraestrutura para carro elétrico" },
-      { id: 2, icon: <Users size={20} />, label: "Visitantes", desc: "10 vagas internas dedicadas" },
-      { id: 3, icon: <Accessibility size={20} />, label: "Acessível", desc: "Totalmente adaptado para PNE" },
-      { id: 4, icon: <Archive size={20} />, label: "Depósito", desc: "Depósito privativo de 6m²" }
+      { id: 1, icon: 'Zap', label: "Carga Elétrica", desc: "Infraestrutura para carro elétrico" },
+      { id: 2, icon: 'Users', label: "Visitantes", desc: "10 vagas internas dedicadas" },
+      { id: 3, icon: 'Accessibility', label: "Acessível", desc: "Totalmente adaptado para PNE" },
+      { id: 4, icon: 'Archive', label: "Depósito", desc: "Depósito privativo de 6m²" }
+    ],
+    lifeAround: [
+      { id: 1, icon: 'Trees', label: "Parque do Povo" },
+      { id: 2, icon: 'Coffee', label: "Cafeterias" },
+      { id: 3, icon: 'ShoppingBag', label: "Comércio Local" }
     ],
     location_details: "A 300m do Parque do Povo."
-  },
-  {
-    id: "RAVA-002",
-    title: "Penthouse Contemporânea",
-    type: "Aluguel",
-    category: "Corporativo",
-    propertyType: "Cobertura",
-    premiumTags: ["cobertura", "pet", "smarthome", "varanda", "pronto", "piscina"],
-    price: 18000,
-    condo: 1950,
-    iptu: 600,
-    area: 145,
-    rooms: 2,
-    suites: 2,
-    baths: 2,
-    parking: 2,
-    neighborhood: "Pinheiros",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
-    description: "Vista infinita para o pôr do sol. Uma penthouse desenhada para o estilo de vida cosmopolita, com integração total de ambientes.",
-    petPolicy: "Aceita Animais pequenos",
-    features: ["Piso em Carvalho", "Ilha de Cocção", "Som Integrado", "Automação Savant", "Blackout Motorizado", "Jacuzzi Privativa", "Terraço Lounge"],
-    amenities: ["Rooftop Lounge", "Piscina Infinita", "Coworking Privativo", "Academia de Grife", "Lavanderia VIP", "Pet Care"],
-    conveniences: [
-        { id: 1, icon: <Wifi size={20} />, label: "Conectividade", desc: "Fibra dedicada no edifício" },
-        { id: 2, icon: <Zap size={20} />, label: "Carga Elétrica", desc: "Vaga com carregador instalado" }
-    ],
-    location_details: "Eixo privilegiado na Faria Lima."
-  },
-  {
-    id: "RAVA-003",
-    title: "Villa nos Jardins",
-    type: "Venda",
-    category: "Investimento",
-    propertyType: "Casa",
-    premiumTags: ["adega", "jardim", "piscina", "spa", "pronto"],
-    price: 12800000,
-    condo: 5500,
-    iptu: 2400,
-    area: 420,
-    rooms: 4,
-    suites: 4,
-    baths: 6,
-    parking: 5,
-    neighborhood: "Jardins",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
-    description: "A máxima expressão da sofisticação urbana. Privacidade absoluta em meio ao verde dos Jardins.",
-    petPolicy: "Restrição em áreas comuns",
-    features: ["Gerador Total", "Cozinha Industrial", "Adega", "Blindagem", "Elevador Privativo", "Aspiração Central", "Aquecimento Solar"],
-    amenities: ["Segurança Armada 24h", "Campo de Tênis", "Jardim Burle Marx", "Piscina com Raia 25m", "Espaço Zen", "Sauna Úmida", "Quadra de Squash"],
-    conveniences: [
-        { id: 1, icon: <ShieldCheck size={20} />, label: "Segurança", desc: "Protocolo diplomático" },
-        { id: 2, icon: <Archive size={20} />, label: "Depósito", desc: "Depósito amplo no subsolo" }
-    ],
-    location_details: "Rua fechada com monitoramento constante."
-  },
-  {
-    id: "RAVA-004",
-    title: "Skyline Moema Pássaros",
-    type: "Venda",
-    category: "Residencial",
-    propertyType: "Apartamento",
-    premiumTags: ["pet", "piscina", "spa", "varanda", "pronto"],
-    price: 3200000,
-    condo: 1800,
-    iptu: 750,
-    area: 125,
-    rooms: 3,
-    suites: 2,
-    baths: 3,
-    parking: 2,
-    neighborhood: "Moema",
-    image: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=1200&q=80",
-    description: "Localização ímpar fora da rota de aviões, com vista definitiva para a copa das árvores.",
-    petPolicy: "Aceita Animais",
-    features: ["Vista Parque", "Varanda Integrada", "Lareira Ecológica", "Suíte Master", "Marcenaria Premium", "Piso Térmico nos Banheiros"],
-    amenities: ["Piscina de Vidro", "Sauna Seca", "Ludoteca Design", "Academia Completa", "Salão Gourmet", "Horta Comunitária"],
-    conveniences: [{ id: 1, icon: <Zap size={20} />, label: "Carga Elétrica", desc: "Infraestrutura completa" }],
-    location_details: "Próximo à Igreja de Moema e Ibirapuera."
-  },
-  {
-    id: "RAVA-005",
-    title: "Mansion Vila Nova",
-    type: "Aluguel",
-    category: "Luxo Extremo",
-    propertyType: "Apartamento",
-    premiumTags: ["pet", "piscina", "adega", "smarthome", "pronto", "homeoffice"],
-    price: 45000,
-    condo: 6200,
-    iptu: 2800,
-    area: 380,
-    rooms: 4,
-    suites: 4,
-    baths: 5,
-    parking: 4,
-    neighborhood: "Vila Nova Conceição",
-    image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80",
-    description: "Exclusividade no m² mais valioso de São Paulo. Um projeto de neoclássico moderno.",
-    petPolicy: "Aceita Animais",
-    features: ["Adega Climatizada", "Cozinha Viking", "Dependência completa", "Banheira de Imersão", "Automação Total", "Pé Direito Triplo"],
-    amenities: ["Fitness Center", "Piscina Coberta Aquecida", "Concierge 24h", "Segurança Armada", "Espaço Pilates", "Sala de Motoristas"],
-    conveniences: [{ id: 1, icon: <Zap size={20} />, label: "Carga Elétrica", desc: "Vaga dedicada com totem" }],
-    location_details: "Ao lado da Praça Pereira Coutinho."
-  },
-  {
-    id: "RAVA-006",
-    title: "Arte Higienópolis",
-    type: "Venda",
-    category: "Clássico Modernista",
-    propertyType: "Apartamento",
-    premiumTags: ["pet", "pronto", "jardim"],
-    price: 5900000,
-    condo: 3400,
-    iptu: 1500,
-    area: 260,
-    rooms: 3,
-    suites: 3,
-    baths: 4,
-    parking: 3,
-    neighborhood: "Higienópolis",
-    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
-    description: "Apartamento modernista icônico com janelões do chão ao teto. Planta livre e muita luz natural.",
-    petPolicy: "Aceita Animais",
-    features: ["Janelas Panorâmicas", "Pé Direito de 3m", "Piso Original em Taco", "Cozinha Aberta", "Despensa", "Lavabo Design"],
-    amenities: ["Segurança Armada 24h", "Jardim Interno", "Vagas Visitantes", "Gerador de Energia", "Salão de Festas Clássico"],
-    conveniences: [{ id: 1, icon: <Archive size={20} />, label: "Depósito", desc: "Depósito amplo privativo" }],
-    location_details: "Frente à Praça Buenos Aires."
-  },
-  {
-    id: "RAVA-007",
-    title: "Mansão Brooklin Contemporânea",
-    type: "Venda",
-    category: "Luxo Extremo",
-    propertyType: "Casa",
-    premiumTags: ["piscina", "jardim", "varanda", "pet", "spa"],
-    price: 15000000,
-    condo: 0,
-    iptu: 4500,
-    area: 550,
-    rooms: 5,
-    suites: 5,
-    baths: 6,
-    parking: 6,
-    neighborhood: "Brooklin",
-    image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80",
-    description: "Mansão contemporânea com piscina olímpica e jardim paisagístico de 200m². Projeto arquitetônico premiado com integração total entre áreas internas e externas.",
-    petPolicy: "Aceita Animais de todos os portes",
-    features: ["Piscina Olímpica", "Jardim Burle Marx", "Adega 500 garrafas", "Home Theater", "Elevador Panorâmico", "Churrasqueira Gourmet", "Sauna Seca e Úmida", "Quadra Poliesportiva"],
-    amenities: ["Segurança 24h", "Câmeras 360°", "Gerador Total", "Sistema Solar", "Aspiração Central", "Aquecimento Piso"],
-    conveniences: [
-      { id: 1, icon: <Zap size={20} />, label: "Energia Solar", desc: "Sistema completo fotovoltaico" },
-      { id: 2, icon: <ShieldCheck size={20} />, label: "Blindagem", desc: "Vidros blindados nível 3" }
-    ],
-    location_details: "Rua sem saída com segurança privada."
-  },
-  {
-    id: "RAVA-008",
-    title: "Loft Industrial Alto",
-    type: "Aluguel",
-    category: "Contemporâneo",
-    propertyType: "Loft",
-    premiumTags: ["loft", "smarthome", "pronto", "homeoffice"],
-    price: 8500,
-    condo: 850,
-    iptu: 380,
-    area: 120,
-    rooms: 2,
-    suites: 1,
-    baths: 2,
-    parking: 2,
-    neighborhood: "Alto de Pinheiros",
-    image: "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=1200&q=80",
-    description: "Loft industrial com automação completa e acabamento premium. Pé direito duplo, estrutura aparente e design minimalista. Perfeito para profissionais criativos.",
-    petPolicy: "Aceita Animais pequenos",
-    features: ["Pé Direito Duplo", "Automação Completa", "Estrutura Aparente", "Home Office Integrado", "Ilha Gourmet", "Iluminação LED Programável"],
-    amenities: ["Coworking", "Bike Sharing", "Lavanderia Compartilhada", "Terraço Comum", "Pet Care"],
-    conveniences: [
-      { id: 1, icon: <Wifi size={20} />, label: "Internet", desc: "Fibra ótica 1GB inclusa" },
-      { id: 2, icon: <Zap size={20} />, label: "Smart Home", desc: "Alexa e Google Home" }
-    ],
-    location_details: "Próximo à Praça Panamericana."
-  },
-  {
-    id: "RAVA-009",
-    title: "Corporativo Vila Olímpia Premium",
-    type: "Venda",
-    category: "Corporativo Premium",
-    propertyType: "Apartamento",
-    premiumTags: ["varanda", "homeoffice", "metro", "pet", "smarthome"],
-    price: 5500000,
-    condo: 2200,
-    iptu: 1100,
-    area: 280,
-    rooms: 4,
-    suites: 3,
-    baths: 3,
-    parking: 4,
-    neighborhood: "Vila Olímpia",
-    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80",
-    description: "Apartamento corporativo premium a 200m do metrô Vila Olímpia. Home office completo de 35m² com banheiro e entrada independente. Vista privilegiada para Marginal Pinheiros.",
-    petPolicy: "Aceita Animais",
-    features: ["Home Office 35m²", "Varanda 60m²", "Vista Marginal", "Automação Controle4", "Ar Central", "Piso Porcelanato Carrara"],
-    amenities: ["Business Center", "Sala de Reuniões", "Academia 24h", "Piscina Aquecida", "Espaço Gourmet", "Valet Service"],
-    conveniences: [
-      { id: 1, icon: <Zap size={20} />, label: "Metrô", desc: "200m estação Vila Olímpia" },
-      { id: 2, icon: <Wifi size={20} />, label: "Coworking", desc: "Espaço dedicado no prédio" }
-    ],
-    location_details: "Eixo Berrini/Faria Lima, ao lado do metrô."
   }
 ];
 
+// NEIGHBORHOOD PAGES - para o carrossel de bairros na homepage
 export const NEIGHBORHOOD_PAGES = [
   [
     { id: 'itaim', name: 'Itaim Bibi', size: 'large', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80' },
@@ -330,8 +119,5 @@ export const NEIGHBORHOOD_PAGES = [
     { id: 'higienopolis', name: 'Higienópolis', size: 'medium', img: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80' },
     { id: 'brooklin', name: 'Brooklin', size: 'small', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80' },
     { id: 'alto', name: 'Alto de Pinheiros', size: 'small', img: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80' },
-  ],
-  [
-    { id: 'vilaolimpia', name: 'Vila Olímpia', size: 'large', img: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1200&q=80' },
   ]
 ];
