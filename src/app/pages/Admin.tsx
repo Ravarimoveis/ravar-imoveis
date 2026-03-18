@@ -338,38 +338,41 @@ export default function Admin() {
   }
 
   return (
-    <div className="dark min-h-screen bg-[#0A1929] text-white pt-24 p-8">
+    <div className="dark min-h-screen bg-[#0A1929] text-white pt-24 p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8 sticky top-20 bg-[#0A1929] z-40 py-4 -mx-8 px-8">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 lg:gap-0 mb-6 md:mb-8 sticky top-20 bg-[#0A1929] z-40 py-4 -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
           <div>
-            <h1 className="text-4xl font-bold text-[#AF9042] mb-2">Painel Administrativo RAVAR</h1>
-            <p className="text-gray-400">Gerencie os imóveis do seu portfólio</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#AF9042] mb-2">Painel Administrativo RAVAR</h1>
+            <p className="text-sm md:text-base text-gray-400">Gerencie os imóveis do seu portfólio</p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 md:gap-3">
             <Button 
               onClick={() => navigate('/admin/sections')}
               variant="outline"
-              className="border-[#AF9042] text-[#AF9042] hover:bg-[#AF9042]/10"
+              className="border-[#AF9042] text-[#AF9042] hover:bg-[#AF9042]/10 text-xs md:text-sm"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              Gerenciar Seções
+              <Settings className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Gerenciar Seções</span>
+              <span className="sm:hidden">Seções</span>
             </Button>
 
             <Button 
               onClick={handleCleanupMockData}
               disabled={cleaningData}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm"
             >
               {cleaningData ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Limpando...
+                  <Loader2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 animate-spin" />
+                  <span className="hidden sm:inline">Limpando...</span>
+                  <span className="sm:hidden">...</span>
                 </>
               ) : (
                 <>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Limpar Dados Mockados
+                  <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                  <span className="hidden sm:inline">Limpar Dados Mockados</span>
+                  <span className="sm:hidden">Limpar</span>
                 </>
               )}
             </Button>
@@ -377,10 +380,10 @@ export default function Admin() {
             <Button 
               onClick={handleLogout}
               variant="outline"
-              className="border-gray-600 !text-white hover:bg-gray-700 hover:!text-white hover:border-gray-500"
+              className="border-gray-600 !text-white hover:bg-gray-700 hover:!text-white hover:border-gray-500 text-xs md:text-sm"
               style={{ color: 'white !important' }}
             >
-              <LogOut className="w-4 h-4 mr-2" style={{ color: 'white' }} />
+              <LogOut className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" style={{ color: 'white' }} />
               <span style={{ color: 'white' }}>Sair</span>
             </Button>
 
@@ -388,9 +391,9 @@ export default function Admin() {
               <DialogTrigger asChild>
                 <Button 
                   onClick={() => handleOpenDialog()}
-                  className="bg-[#AF9042] hover:bg-[#8f7635] text-white"
+                  className="bg-[#AF9042] hover:bg-[#8f7635] text-white text-xs md:text-sm"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                   Novo Imóvel
                 </Button>
               </DialogTrigger>
@@ -741,6 +744,14 @@ export default function Admin() {
                                 alt={`Preview ${index + 1}`} 
                                 className="w-full h-20 object-cover rounded" 
                               />
+                              
+                              {/* ✅ MARCA D'ÁGUA AUTOMÁTICA NO PREVIEW */}
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div className="text-white/40 text-[8px] sm:text-[10px] font-extralight tracking-wider rotate-[-45deg] select-none">
+                                  RAVAR
+                                </div>
+                              </div>
+                              
                               {formData.image === url && (
                                 <div className="absolute inset-0 bg-[#AF9042]/20 flex items-center justify-center rounded">
                                   <span className="bg-[#AF9042] text-white text-xs px-2 py-1 rounded font-bold">
@@ -795,7 +806,7 @@ export default function Admin() {
         </div>
 
         {/* Lista de Imóveis */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {properties.map((property) => (
             <Card key={property.id} className="bg-[#1a2332] border-gray-700 overflow-hidden">
               <div className="relative h-48">
@@ -804,41 +815,41 @@ export default function Admin() {
                   alt={property.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-2 right-2 bg-[#AF9042] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                <div className="absolute top-2 right-2 bg-[#AF9042] text-white px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-semibold">
                   {property.id}
                 </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold text-white mb-2">{property.title}</h3>
-                <p className="text-gray-400 text-sm mb-2">{property.neighborhood}</p>
-                <p className="text-[#AF9042] font-bold mb-4">
+              <div className="p-3 md:p-4">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2 line-clamp-1">{property.title}</h3>
+                <p className="text-gray-400 text-xs md:text-sm mb-1 md:mb-2">{property.neighborhood}</p>
+                <p className="text-[#AF9042] font-bold mb-3 md:mb-4 text-sm md:text-base">
                   {property.price > 0 
                     ? property.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                     : 'Sob Consulta'
                   }
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     onClick={() => handleOpenDialog(property)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2"
                   >
-                    <Edit className="w-4 h-4 mr-2" />
+                    <Edit className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                     Editar
                   </Button>
                   <Button
                     onClick={() => handleDelete(property.id)}
                     variant="destructive"
-                    className="flex-1"
+                    className="flex-1 text-xs md:text-sm py-2"
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                     Deletar
                   </Button>
                   <Button
                     onClick={() => handleResetToMock(property.id)}
                     variant="outline"
-                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-xs md:text-sm py-2"
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" />
+                    <RefreshCw className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                     Resetar
                   </Button>
                 </div>

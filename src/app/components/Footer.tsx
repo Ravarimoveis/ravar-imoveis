@@ -43,7 +43,7 @@ export function Footer() {
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center text-[9px] font-light text-white/30 uppercase tracking-[0.2em] gap-4">
-          <p>© 2026 RAVAR IMÓVEIS • CRECI 00.000-J • SÃO PAULO</p>
+          <p>© 2026 RAVAR IMÓVEIS • CRECI: 158809-F/SP • SÃO PAULO</p>
           <Link to="/admin" className="hover:text-[#AF9042] transition-colors">Admin</Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { BedDouble, Bath, Car, Square, Heart } from 'lucide-react';
 import { formatCurrency } from '../data/properties';
+import { useState } from 'react';
 
 interface PropertyCardProps {
   prop: any;
@@ -7,6 +8,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const isAluguel = prop.type === 'Aluguel';
   const totalValue = isAluguel ? (prop.price + (prop.condo || 0) + (prop.iptu || 0)) : prop.price;
   const priceDisplay = formatCurrency(totalValue);
@@ -14,8 +16,31 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
   
   return (
     <div className="group cursor-pointer text-left" onClick={onNavigate}>
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm mb-6 shadow-sm group-hover:shadow-xl transition-all duration-700">
-        <img src={prop.image} className="w-full h-full object-cover transition-all duration-[2s] group-hover:scale-105" alt={prop.title} />
+      <div className="relative aspect-[3/4] overflow-hidden rounded-sm mb-6 shadow-sm group-hover:shadow-xl transition-all duration-700 bg-gray-100">
+        
+        {/* ✅ SKELETON LOADER */}
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+        )}
+        
+        {/* ✅ LAZY LOADING + FADE IN */}
+        <img 
+          src={prop.image} 
+          loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          className={`w-full h-full object-cover transition-all duration-[2s] group-hover:scale-105 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          alt={prop.title} 
+        />
+        
+        {/* ✅ MARCA D'ÁGUA AUTOMÁTICA */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="text-white/20 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extralight tracking-[0.4em] rotate-[-45deg] select-none">
+            RAVAR
+          </div>
+        </div>
+        
         <div className="absolute top-6 left-6 flex gap-2">
           <span className="bg-white/90 backdrop-blur px-3 py-1 text-[8px] font-light uppercase tracking-widest text-[#0A1929] border border-gray-100">{prop.type}</span>
         </div>

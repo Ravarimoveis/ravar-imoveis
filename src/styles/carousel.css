@@ -1,0 +1,141 @@
+/* ========================================
+   RAVAR - Carrossel de Imóveis em Destaque
+   ======================================== */
+
+/* Container do carrossel */
+.featured-properties-carousel {
+  position: relative;
+  padding: 0 40px;
+}
+
+@media (max-width: 640px) {
+  .featured-properties-carousel {
+    padding: 0 20px;
+  }
+}
+
+/* Setas de navegação */
+.featured-properties-carousel .slick-prev,
+.featured-properties-carousel .slick-next {
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: all 0.3s ease;
+  display: flex !important;
+  align-items: center;
+  justify-center: center;
+}
+
+.featured-properties-carousel .slick-prev:hover,
+.featured-properties-carousel .slick-next:hover {
+  background: #AF9042;
+  transform: scale(1.1);
+  box-shadow: 0 6px 30px rgba(175, 144, 66, 0.3);
+}
+
+.featured-properties-carousel .slick-prev {
+  left: -25px;
+}
+
+.featured-properties-carousel .slick-next {
+  right: -25px;
+}
+
+.featured-properties-carousel .slick-prev:before,
+.featured-properties-carousel .slick-next:before {
+  display: none;
+}
+
+/* Esconder setas no mobile */
+@media (max-width: 640px) {
+  .featured-properties-carousel .slick-prev,
+  .featured-properties-carousel .slick-next {
+    display: none !important;
+  }
+}
+
+/* Dots (indicadores) */
+.featured-properties-carousel .slick-dots {
+  bottom: -50px;
+  display: flex !important;
+  justify-content: center;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.featured-properties-carousel .slick-dots li {
+  margin: 0;
+  padding: 0;
+  width: auto;
+  height: auto;
+}
+
+.featured-properties-carousel .slick-dots li button {
+  width: 24px;
+  height: 6px;
+  padding: 0;
+  border-radius: 3px;
+  background: #D1D5DB;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0;
+  line-height: 0;
+}
+
+.featured-properties-carousel .slick-dots li button:before {
+  display: none;
+}
+
+.featured-properties-carousel .slick-dots li.slick-active button {
+  width: 48px;
+  background: #AF9042;
+}
+
+.featured-properties-carousel .slick-dots li button:hover {
+  background: rgba(175, 144, 66, 0.5);
+}
+
+/* Slide interno */
+.featured-properties-carousel .slick-slide {
+  opacity: 0.6;
+  transform: scale(0.95);
+  transition: all 0.5s ease;
+}
+
+.featured-properties-carousel .slick-slide.slick-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Padding interno dos cards */
+.featured-properties-carousel .slick-slide > div {
+  padding: 0 12px;
+}
+
+@media (max-width: 768px) {
+  .featured-properties-carousel .slick-slide > div {
+    padding: 0 8px;
+  }
+}
+
+/* Animação suave no carregamento */
+.featured-properties-carousel {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
