@@ -862,3 +862,16 @@ export default function Admin() {
     </div>
   );
 }
+
+{/* video youtube */}
+<div>
+  <Label htmlFor="videoUrl">Link do Vídeo (YouTube)</Label>
+  <Input
+    id="videoUrl"
+    value={formData.videoUrl || ''}
+    onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+    placeholder="Ex: https://www.youtube.com/watch?v=..."
+    className="bg-[#1a2332] border-gray-700"
+  />
+  <p className="text-xs text-gray-500 mt-1">Cole aqui o link do vídeo que você subiu.</p>
+</div>
