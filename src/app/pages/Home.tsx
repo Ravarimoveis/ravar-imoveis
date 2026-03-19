@@ -678,7 +678,8 @@ export function Home() {
                       arrows: false,
                       centerMode: false,
                       variableWidth: false,
-                      adaptiveHeight: true
+                      adaptiveHeight: true,
+                      centerPadding: '0px'
                     }
                   }
                 ]}
