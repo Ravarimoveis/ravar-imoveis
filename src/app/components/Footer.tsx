@@ -1,18 +1,31 @@
-import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
-import logoBranco from 'figma:asset/56be175b5545f5bc08f2b12a39e110a0514923ea.png';
+import { Instagram, Facebook, Linkedin, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
+import { LogoPlaceholder } from './LogoPlaceholder';
+import { useState } from 'react';
 
 export function Footer() {
+  const logoBranco = '/logo-ravar-branco.png';
+  const [logoError, setLogoError] = useState(false);
+  
   return (
     <footer className="bg-[#0A1929] text-white pt-24 pb-12">
       <div className="container mx-auto px-10 text-left">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20 border-b border-white/5 pb-20">
           <div className="col-span-1">
-            <img 
-              src={logoBranco} 
-              alt="RAVAR Imóveis Selecionados" 
-              className="h-16 sm:h-20 md:h-24 w-auto object-contain mb-6"
-            />
+            {logoError ? (
+              <LogoPlaceholder 
+                variant="white" 
+                className="h-16 sm:h-20 md:h-24 w-auto mb-6"
+              />
+            ) : (
+              <img 
+                src={logoBranco} 
+                alt="RAVAR Imóveis Selecionados" 
+                className="h-16 sm:h-20 md:h-24 w-auto object-contain mb-6"
+                onError={() => setLogoError(true)}
+              />
+            )}
             <p className="text-white/40 font-light text-[11px] leading-relaxed tracking-wider uppercase text-left">
               A definição do morar exclusivo em São Paulo. Curadoria de alto padrão para clientes globais.
             </p>

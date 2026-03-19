@@ -10,7 +10,10 @@ import {
 import { FaWhatsapp } from 'react-icons/fa';
 import { formatCurrency } from '../data/properties';
 import { useProperties } from '../hooks/useProperties';
-import marcaDagua from 'figma:asset/9e2879d89e5853f5fe9dc7ca1f55c2a3d20e82c6.png';
+import { MarcaDaguaPlaceholder } from '../components/LogoPlaceholder';
+
+// Marca d'água from public folder
+const marcaDagua = '/marca-dagua-ravar.png';
 
 // Map icon names to actual icon components
 const iconMap: { [key: string]: any } = {
@@ -26,6 +29,7 @@ export function PropertyDetail() {
   const property = properties.find(p => p.id === id);
   const [selectedImage, setSelectedImage] = useState(0);
   const [mainImageLoaded, setMainImageLoaded] = useState(false);
+  const [marcaDaguaError, setMarcaDaguaError] = useState(false);
 
   // Scroll to top quando abrir a página
   useEffect(() => {
@@ -96,13 +100,18 @@ export function PropertyDetail() {
                  onLoad={() => setMainImageLoaded(true)}
                />
                
-               {/* ✅ MARCA D'ÁGUA AUTOMÁTICA */}
+               {/* ✅ MARCA D'ÁGUA AUTOMÁTICA - IMAGEM OU FALLBACK */}
                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                 <img 
-                   src={marcaDagua} 
-                   alt="" 
-                   className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20 select-none"
-                 />
+                 {marcaDaguaError ? (
+                   <MarcaDaguaPlaceholder className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20" />
+                 ) : (
+                   <img 
+                     src={marcaDagua} 
+                     alt="" 
+                     className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20 select-none"
+                     onError={() => setMarcaDaguaError(true)}
+                   />
+                 )}
                </div>
                
                <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 md:bottom-10 md:left-10 flex flex-col sm:flex-row gap-2 sm:gap-4">
@@ -135,11 +144,16 @@ export function PropertyDetail() {
                       
                       {/* ✅ MARCA D'ÁGUA AUTOMÁTICA NAS THUMBNAILS */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <img 
-                          src={marcaDagua} 
-                          alt="" 
-                          className="w-full opacity-30 select-none"
-                        />
+                        {marcaDaguaError ? (
+                          <MarcaDaguaPlaceholder className="w-full opacity-30" />
+                        ) : (
+                          <img 
+                            src={marcaDagua} 
+                            alt="" 
+                            className="w-full opacity-30 select-none"
+                            onError={() => setMarcaDaguaError(true)}
+                          />
+                        )}
                       </div>
                     </button>
                   ))}

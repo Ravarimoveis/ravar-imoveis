@@ -1,0 +1,6 @@
+Este arquivo é apenas um marcador.
+
+SUBSTITUA por: logo-ravar-colorido.png
+(Logo colorido RAVAR em PNG com fundo transparente - cores navy e dourado)
+
+Após adicionar a imagem PNG, você pode deletar este arquivo .txt

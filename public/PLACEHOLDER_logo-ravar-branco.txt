@@ -1,0 +1,6 @@
+Este arquivo é apenas um marcador.
+
+SUBSTITUA por: logo-ravar-branco.png
+(Logo branco RAVAR em PNG com fundo transparente)
+
+Após adicionar a imagem PNG, você pode deletar este arquivo .txt

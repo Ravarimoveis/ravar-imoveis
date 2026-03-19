@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
-import logoColorido from 'figma:asset/2c0c9e714a683c386c41e5fbdf2764ce201f385d.png';
-import logoBranco from 'figma:asset/56be175b5545f5bc08f2b12a39e110a0514923ea.png';
+import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LogoPlaceholder } from './LogoPlaceholder';
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === '/';
+  
+  // Logo paths from public folder
+  const logoBranco = '/logo-ravar-branco.png';
+  const logoColorido = '/logo-ravar-colorido.png';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -21,11 +25,19 @@ export function Navbar() {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrolled || !isHome ? 'bg-white py-4 border-b border-gray-100 shadow-sm' : 'bg-transparent py-8'}`}>
         <div className="container mx-auto px-4 sm:px-6 md:px-10 flex justify-between items-center text-left">
           <Link to="/" className="flex items-center cursor-pointer group no-underline">
-            <img 
-              src={scrolled || !isHome ? logoColorido : logoBranco} 
-              alt="RAVAR Imóveis Selecionados" 
-              className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto object-contain transition-all duration-700"
-            />
+            {logoError ? (
+              <LogoPlaceholder 
+                variant={scrolled || !isHome ? 'colored' : 'white'} 
+                className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto transition-all duration-700"
+              />
+            ) : (
+              <img 
+                src={scrolled || !isHome ? logoColorido : logoBranco} 
+                alt="RAVAR Imóveis Selecionados" 
+                className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto object-contain transition-all duration-700"
+                onError={() => setLogoError(true)}
+              />
+            )}
           </Link>
           <div className="hidden lg:flex items-center gap-12 text-left">
             {[
@@ -52,11 +64,19 @@ export function Navbar() {
             <X size={32} strokeWidth={1} className="text-[#AF9042]"/>
           </button>
           <div className="absolute top-10 left-10">
-            <img 
-              src={logoBranco} 
-              alt="RAVAR" 
-              className="h-16 sm:h-20 w-auto object-contain"
-            />
+            {logoError ? (
+              <LogoPlaceholder 
+                variant="white" 
+                className="h-16 sm:h-20 w-auto"
+              />
+            ) : (
+              <img 
+                src={logoBranco} 
+                alt="RAVAR" 
+                className="h-16 sm:h-20 w-auto object-contain"
+                onError={() => setLogoError(true)}
+              />
+            )}
           </div>
           {[
             {label: 'Home', to: '/'},

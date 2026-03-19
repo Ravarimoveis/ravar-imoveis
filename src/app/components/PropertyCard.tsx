@@ -1,7 +1,11 @@
-import { BedDouble, Bath, Car, Square, Heart } from 'lucide-react';
 import { formatCurrency } from '../data/properties';
+import { MapPin, BedDouble, Bath, Square, Car, Heart } from 'lucide-react';
 import { useState } from 'react';
-import marcaDagua from 'figma:asset/9e2879d89e5853f5fe9dc7ca1f55c2a3d20e82c6.png';
+import { LazyImage } from './LazyImage';
+import { MarcaDaguaPlaceholder } from './LogoPlaceholder';
+
+// Marca d'água from public folder
+const marcaDagua = '/marca-dagua-ravar.png';
 
 interface PropertyCardProps {
   prop: any;
@@ -10,6 +14,7 @@ interface PropertyCardProps {
 
 export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [marcaDaguaError, setMarcaDaguaError] = useState(false);
   const isAluguel = prop.type === 'Aluguel';
   const totalValue = isAluguel ? (prop.price + (prop.condo || 0) + (prop.iptu || 0)) : prop.price;
   const priceDisplay = formatCurrency(totalValue);
@@ -25,7 +30,7 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
         )}
         
         {/* ✅ LAZY LOADING + FADE IN */}
-        <img 
+        <LazyImage 
           src={prop.image} 
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
@@ -35,13 +40,18 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
           alt={prop.title} 
         />
         
-        {/* ✅ MARCA D'ÁGUA AUTOMÁTICA - IMAGEM */}
+        {/* ✅ MARCA D'ÁGUA AUTOMÁTICA - IMAGEM OU FALLBACK */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <img 
-            src={marcaDagua} 
-            alt="" 
-            className="w-[90%] sm:w-[82%] md:w-[75%] opacity-20 select-none"
-          />
+          {marcaDaguaError ? (
+            <MarcaDaguaPlaceholder className="w-[90%] sm:w-[82%] md:w-[75%] opacity-20" />
+          ) : (
+            <img 
+              src={marcaDagua} 
+              alt="" 
+              className="w-[90%] sm:w-[82%] md:w-[75%] opacity-20 select-none"
+              onError={() => setMarcaDaguaError(true)}
+            />
+          )}
         </div>
         
         <div className="absolute top-6 left-6 flex gap-2">
