@@ -10,6 +10,7 @@ import {
 import { FaWhatsapp } from 'react-icons/fa';
 import { formatCurrency } from '../data/properties';
 import { useProperties } from '../hooks/useProperties';
+import marcaDagua from 'figma:asset/9e2879d89e5853f5fe9dc7ca1f55c2a3d20e82c6.png';
 
 // Map icon names to actual icon components
 const iconMap: { [key: string]: any } = {
@@ -97,9 +98,11 @@ export function PropertyDetail() {
                
                {/* ✅ MARCA D'ÁGUA AUTOMÁTICA */}
                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                 <div className="text-white/20 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extralight tracking-[0.4em] rotate-[-45deg] select-none">
-                   RAVAR
-                 </div>
+                 <img 
+                   src={marcaDagua} 
+                   alt="" 
+                   className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20 select-none"
+                 />
                </div>
                
                <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 md:bottom-10 md:left-10 flex flex-col sm:flex-row gap-2 sm:gap-4">
@@ -132,9 +135,11 @@ export function PropertyDetail() {
                       
                       {/* ✅ MARCA D'ÁGUA AUTOMÁTICA NAS THUMBNAILS */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="text-white/30 text-xs font-extralight tracking-[0.2em] rotate-[-45deg] select-none">
-                          RAVAR
-                        </div>
+                        <img 
+                          src={marcaDagua} 
+                          alt="" 
+                          className="w-full opacity-30 select-none"
+                        />
                       </div>
                     </button>
                   ))}

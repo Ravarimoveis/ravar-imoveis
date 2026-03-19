@@ -1,6 +1,7 @@
 import { BedDouble, Bath, Car, Square, Heart } from 'lucide-react';
 import { formatCurrency } from '../data/properties';
 import { useState } from 'react';
+import marcaDagua from 'figma:asset/9e2879d89e5853f5fe9dc7ca1f55c2a3d20e82c6.png';
 
 interface PropertyCardProps {
   prop: any;
@@ -34,11 +35,13 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
           alt={prop.title} 
         />
         
-        {/* ✅ MARCA D'ÁGUA AUTOMÁTICA */}
+        {/* ✅ MARCA D'ÁGUA AUTOMÁTICA - IMAGEM */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-white/20 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extralight tracking-[0.4em] rotate-[-45deg] select-none">
-            RAVAR
-          </div>
+          <img 
+            src={marcaDagua} 
+            alt="" 
+            className="w-[90%] sm:w-[82%] md:w-[75%] opacity-20 select-none"
+          />
         </div>
         
         <div className="absolute top-6 left-6 flex gap-2">

@@ -644,6 +644,8 @@ export function Home() {
                 autoplay={true}
                 autoplaySpeed={5000}
                 arrows={true}
+                centerMode={false}
+                variableWidth={false}
                 prevArrow={
                   <button className="slick-prev">
                     <ChevronLeft size={24} className="text-[#AF9042]" />
@@ -661,7 +663,9 @@ export function Home() {
                       slidesToShow: 2,
                       slidesToScroll: 1,
                       infinite: properties.length > 2,
-                      dots: true
+                      dots: true,
+                      centerMode: false,
+                      variableWidth: false
                     }
                   },
                   {
@@ -671,13 +675,16 @@ export function Home() {
                       slidesToScroll: 1,
                       infinite: properties.length > 1,
                       dots: true,
-                      arrows: false
+                      arrows: false,
+                      centerMode: false,
+                      variableWidth: false,
+                      adaptiveHeight: true
                     }
                   }
                 ]}
               >
                 {properties.map(prop => (
-                  <div key={prop.id} className="px-3 md:px-6">
+                  <div key={prop.id} className="px-0">
                     <PropertyCard prop={prop} onNavigate={() => navigate(`/imovel/${prop.id}`)} />
                   </div>
                 ))}

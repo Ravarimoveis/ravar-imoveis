@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
+import logoColorido from 'figma:asset/2c0c9e714a683c386c41e5fbdf2764ce201f385d.png';
+import logoBranco from 'figma:asset/56be175b5545f5bc08f2b12a39e110a0514923ea.png';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -17,10 +19,13 @@ export function Navbar() {
   return (
     <>
       <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrolled || !isHome ? 'bg-white py-4 border-b border-gray-100 shadow-sm' : 'bg-transparent py-8'}`}>
-        <div className="container mx-auto px-10 flex justify-between items-center text-left">
-          <Link to="/" className="flex flex-col cursor-pointer group no-underline">
-            <span className={`text-2xl font-extralight tracking-[0.4em] transition-colors before:content-none after:content-none ${scrolled || !isHome ? 'text-[#0A1929]' : 'text-white'}`}>RAVAR</span>
-            <span className={`text-[8px] font-light tracking-[0.5em] uppercase mt-1 before:content-none after:content-none ${scrolled || !isHome ? 'text-[#AF9042]' : 'text-white/60'}`}>Imóveis Selecionados</span>
+        <div className="container mx-auto px-4 sm:px-6 md:px-10 flex justify-between items-center text-left">
+          <Link to="/" className="flex items-center cursor-pointer group no-underline">
+            <img 
+              src={scrolled || !isHome ? logoColorido : logoBranco} 
+              alt="RAVAR Imóveis Selecionados" 
+              className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto object-contain transition-all duration-700"
+            />
           </Link>
           <div className="hidden lg:flex items-center gap-12 text-left">
             {[
@@ -46,6 +51,13 @@ export function Navbar() {
           <button onClick={() => setMobileMenu(false)} className="absolute top-10 right-10">
             <X size={32} strokeWidth={1} className="text-[#AF9042]"/>
           </button>
+          <div className="absolute top-10 left-10">
+            <img 
+              src={logoBranco} 
+              alt="RAVAR" 
+              className="h-16 sm:h-20 w-auto object-contain"
+            />
+          </div>
           {[
             {label: 'Home', to: '/'},
             {label: 'Explorar', to: '/explorar'},
