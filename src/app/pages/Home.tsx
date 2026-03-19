@@ -7,7 +7,11 @@ import { PropertyCard } from '../components/PropertyCard';
 import { Waves, Building2, Droplets, Dog, Train, Wine, Briefcase, UtensilsCrossed, Smartphone, Key, Home as HomeIcon, TreePine } from 'lucide-react';
 import * as Slider from '@radix-ui/react-slider';
 import { projectId, publicAnonKey } from '/utils/supabase/info';
-import SlickSlider from 'react-slick';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-e68c254a`;
 
@@ -288,7 +292,7 @@ export function Home() {
                     <div className="bg-white rounded-[2rem] p-10 shadow-2xl border border-gray-100 overflow-hidden text-[#0A1929]">
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-left">
                         
-                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                         {/* COLUNA 1: SELEÇÕES                                  */}
                         {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                         <div className="space-y-6 text-left">
@@ -501,7 +505,7 @@ export function Home() {
                         
                         {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                         {/* COLUNA 3: CARACTERÍSTICAS (Scrollable)              */}
-                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+                        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
                         <div className="space-y-6 text-left max-h-[500px] overflow-y-auto pr-2">
                           {/* INFRAESTRUTURA */}
                           <div>
@@ -635,61 +639,35 @@ export function Home() {
             </div>
           ) : properties && properties.length > 0 ? (
             <div className="featured-properties-carousel">
-              <SlickSlider
-                dots={true}
-                infinite={properties.length > 3}
-                speed={500}
-                slidesToShow={3}
-                slidesToScroll={1}
-                autoplay={true}
-                autoplaySpeed={5000}
-                arrows={true}
-                centerMode={false}
-                variableWidth={false}
-                prevArrow={
-                  <button className="slick-prev">
-                    <ChevronLeft size={24} className="text-[#AF9042]" />
-                  </button>
-                }
-                nextArrow={
-                  <button className="slick-next">
-                    <ChevronRight size={24} className="text-[#AF9042]" />
-                  </button>
-                }
-                responsive={[
-                  {
-                    breakpoint: 1024,
-                    settings: {
-                      slidesToShow: 2,
-                      slidesToScroll: 1,
-                      infinite: properties.length > 2,
-                      dots: true,
-                      centerMode: false,
-                      variableWidth: false
-                    }
+              <Swiper
+                modules={[Pagination]}
+                spaceBetween={30}
+                slidesPerView={1}
+                pagination={{
+                  clickable: true,
+                }}
+                loop={properties.length > 3}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                    spaceBetween: 0,
                   },
-                  {
-                    breakpoint: 640,
-                    settings: {
-                      slidesToShow: 1,
-                      slidesToScroll: 1,
-                      infinite: properties.length > 1,
-                      dots: true,
-                      arrows: true,
-                      centerMode: false,
-                      variableWidth: false,
-                      adaptiveHeight: true,
-                      centerPadding: '0px'
-                    }
-                  }
-                ]}
+                  768: {
+                    slidesPerView: 2,
+                    spaceBetween: 30,
+                  },
+                  1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 40,
+                  },
+                }}
               >
                 {properties.map(prop => (
-                  <div key={prop.id}>
+                  <SwiperSlide key={prop.id}>
                     <PropertyCard prop={prop} onNavigate={() => navigate(`/imovel/${prop.id}`)} />
-                  </div>
+                  </SwiperSlide>
                 ))}
-              </SlickSlider>
+              </Swiper>
             </div>
           ) : (
             <div className="text-center py-20">

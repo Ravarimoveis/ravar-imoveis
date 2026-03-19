@@ -1,0 +1,44 @@
+/* Swiper Custom Styles - RAVAR */
+
+/* Container do Swiper - sem padding para setas */
+.featured-properties-carousel .swiper {
+  padding: 20px 0;
+  overflow: hidden;
+}
+
+/* Pagination Dots */
+.featured-properties-carousel .swiper-pagination {
+  bottom: -10px !important;
+}
+
+.featured-properties-carousel .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #D1D5DB;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.featured-properties-carousel .swiper-pagination-bullet-active {
+  background: #AF9042;
+  width: 32px;
+  border-radius: 4px;
+}
+
+/* Slides */
+.featured-properties-carousel .swiper-slide {
+  height: auto;
+  display: flex;
+}
+
+/* Mobile: garantir 1 slide por vez, largura total, SEM SPOILER */
+@media (max-width: 640px) {
+  .featured-properties-carousel .swiper-slide {
+    width: 100% !important;
+  }
+}
+
+/* Transição suave */
+.featured-properties-carousel .swiper-slide-active {
+  z-index: 2;
+}
