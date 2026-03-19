@@ -153,13 +153,12 @@
     width: 100% !important;
   }
   
-  /* Track (container dos slides) */
+  /* Track (container dos slides) - PERMITIR QUE O SLICK CONTROLE A LARGURA E TRANSFORM */
   .featured-properties-carousel .slick-track {
     display: flex !important;
-    width: 100% !important;
   }
   
-  /* Cada slide individual deve ocupar 100% da largura */
+  /* Cada slide individual deve ocupar 100% da largura do container */
   .featured-properties-carousel .slick-slide {
     width: 100% !important;
     min-width: 100% !important;
