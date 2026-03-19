@@ -53,6 +53,7 @@ export default function Admin() {
     conveniences: [],
     lifeAround: [],
     location_details: ''
+    videoUrl: ''
   });
 
   // Check authentication on mount (frontend-only)
