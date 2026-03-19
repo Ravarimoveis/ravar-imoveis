@@ -675,7 +675,7 @@ export function Home() {
                       slidesToScroll: 1,
                       infinite: properties.length > 1,
                       dots: true,
-                      arrows: false,
+                      arrows: true,
                       centerMode: false,
                       variableWidth: false,
                       adaptiveHeight: true,
