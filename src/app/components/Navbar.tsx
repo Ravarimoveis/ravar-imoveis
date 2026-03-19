@@ -11,8 +11,8 @@ export function Navbar() {
   const isHome = location.pathname === '/';
   
   // Logo paths from public folder
-  const logoBranco = '/logo-ravar-branco.png';
-  const logoColorido = '/logo-ravar-colorido.png';
+  const logoBranco = '/ravar-desktop-branco.png';
+  const logoColorido = '/ravar-desktop-colorido.png';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);

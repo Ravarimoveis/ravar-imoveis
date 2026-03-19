@@ -1,26 +1,29 @@
-import { useParams } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router';
 import { 
-  MapPin, BedDouble, Bath, Car, Square, Minus, CheckCircle2, ShieldCheck, 
-  Dog, Phone, Calendar, Image as ImageIcon, Play, Coffee, PlusSquare, Fuel, ShoppingBag,
-  Home, Building, Waves, Dumbbell, Users, Baby, Bike, Wifi, Wind, Droplets, Trees,
-  Camera, Sparkles, Sun, Mountain, Zap, UtensilsCrossed, GraduationCap, Hospital,
-  Bus, Train, Plane, Building2, Church, Film, Music, Landmark
+  Dog, Home, Building, Car, Waves, Dumbbell, Users, Baby, Bike, Wifi, Wind, Droplets, 
+  Trees, ShieldCheck, Camera, Sparkles, Sun, Mountain, MapPin, Zap,
+  Coffee, ShoppingBag, PlusSquare, Fuel, UtensilsCrossed, GraduationCap, Hospital,
+  Bus, Train, Plane, Building2, Church, Film, Music, Landmark,
+  BedDouble, Bath, Square, ArrowLeft, Heart, Share2, ChevronLeft, ChevronRight, X,
+  Minus, CheckCircle2, Calendar, ImageIcon, Play
 } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
-import { formatCurrency } from '../data/properties';
+import { LazyImage } from '../components/LazyImage';
 import { useProperties } from '../hooks/useProperties';
+import { formatCurrency } from '../data/properties';
 import { MarcaDaguaPlaceholder } from '../components/LogoPlaceholder';
 
 // Marca d'água from public folder
-const marcaDagua = '/marca-dagua-ravar.png';
+const marcaDagua = '/ravar-marca-dagua.png';
 
 // Map icon names to actual icon components
 const iconMap: { [key: string]: any } = {
   Dog, Home, Building, Car, Waves, Dumbbell, Users, Baby, Bike, Wifi, Wind, Droplets, 
   Trees, ShieldCheck, Camera, Sparkles, Sun, Mountain, MapPin, Zap,
   Coffee, ShoppingBag, PlusSquare, Fuel, UtensilsCrossed, GraduationCap, Hospital,
-  Bus, Train, Plane, Building2, Church, Film, Music, Landmark
+  Bus, Train, Plane, Building2, Church, Film, Music, Landmark,
+  BedDouble, Bath, Square
 };
 
 export function PropertyDetail() {
@@ -93,7 +96,7 @@ export function PropertyDetail() {
           
           <div className="lg:col-span-8 text-left">
             <div className="mb-8 md:mb-12 group relative overflow-hidden rounded-sm shadow-xl">
-               <img 
+               <LazyImage 
                  src={displayImages[selectedImage]} 
                  className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[650px] object-cover transition-all duration-[3s] group-hover:scale-105" 
                  alt={property.title} 
@@ -135,7 +138,7 @@ export function PropertyDetail() {
                         selectedImage === idx ? 'border-[#AF9042] scale-105' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <img 
+                      <LazyImage 
                         src={img} 
                         loading="lazy"
                         className="w-full h-full object-cover" 

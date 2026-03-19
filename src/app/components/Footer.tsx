@@ -5,7 +5,7 @@ import { LogoPlaceholder } from './LogoPlaceholder';
 import { useState } from 'react';
 
 export function Footer() {
-  const logoBranco = '/logo-ravar-branco.png';
+  const logoBranco = '/ravar-desktop-branco.png';
   const [logoError, setLogoError] = useState(false);
   
   return (

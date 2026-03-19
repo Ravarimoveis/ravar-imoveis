@@ -1,11 +1,11 @@
-import { formatCurrency } from '../data/properties';
-import { MapPin, BedDouble, Bath, Square, Car, Heart } from 'lucide-react';
 import { useState } from 'react';
+import { Heart, BedDouble, Bath, Car, Square } from 'lucide-react';
 import { LazyImage } from './LazyImage';
 import { MarcaDaguaPlaceholder } from './LogoPlaceholder';
+import { formatCurrency } from '../data/properties';
 
 // Marca d'água from public folder
-const marcaDagua = '/marca-dagua-ravar.png';
+const marcaDagua = '/ravar-marca-dagua.png';
 
 interface PropertyCardProps {
   prop: any;

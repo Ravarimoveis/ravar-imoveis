@@ -1,56 +1,23 @@
 # 🚀 GUIA RÁPIDO - Como Adicionar as Imagens do Logo RAVAR
 
-## ✅ SOLUÇÃO TEMPORÁRIA ESTÁ ATIVA
+## ✅ IMAGENS JÁ ADICIONADAS NO GITHUB!
 
-O site está funcionando **AGORA** com logos SVG temporários (placeholders). Você pode navegar normalmente, mas os logos definitivos precisam ser adicionados.
+As imagens foram encontradas com os seguintes nomes:
+- ✅ `ravar-desktop-branco.png`
+- ✅ `ravar-desktop-colorido.png`
+- ✅ `ravar-marca-dagua.png`
+
+O código foi **atualizado automaticamente** para usar esses nomes. Após o deploy na Vercel, os logos oficiais aparecerão no site!
 
 ---
 
-## 📤 PASSO A PASSO PARA ADICIONAR AS IMAGENS OFICIAIS:
-
-### **1️⃣ LOCALIZE A PASTA `/public/`**
-No seu projeto, encontre a pasta `/public/` na raiz do projeto.
-
-### **2️⃣ PREPARE AS 3 IMAGENS PNG:**
-
-Você precisa de **exatamente 3 arquivos PNG** com estes nomes:
+## 📤 ARQUIVOS NA PASTA `/public/`:
 
 ```
-✅ logo-ravar-branco.png
-✅ logo-ravar-colorido.png
-✅ marca-dagua-ravar.png
+✅ ravar-desktop-branco.png      (Logo branco - usado no header transparente)
+✅ ravar-desktop-colorido.png    (Logo colorido - usado no header com scroll)
+✅ ravar-marca-dagua.png         (Marca d'água - aplicada nas fotos dos imóveis)
 ```
-
-### **3️⃣ ESPECIFICAÇÕES DAS IMAGENS:**
-
-#### **`logo-ravar-branco.png`**
-- **Cor:** Branco puro (#FFFFFF)
-- **Fundo:** Transparente (PNG)
-- **Uso:** Header da home, menu mobile, footer
-- **Tamanho:** ~200-300px de altura (proporcional)
-
-#### **`logo-ravar-colorido.png`**
-- **Cores:** Navy (#0A1929) + Dourado (#AF9042)
-- **Fundo:** Transparente (PNG)
-- **Uso:** Header com scroll, páginas internas
-- **Tamanho:** ~200-300px de altura (proporcional)
-
-#### **`marca-dagua-ravar.png`**
-- **Orientação:** Horizontal (SEM rotação)
-- **Cor:** Branco (#FFFFFF) ou cinza claro
-- **Fundo:** Transparente (PNG)
-- **Uso:** Sobreposta nas fotos dos imóveis
-- **Tamanho:** 800-1200px de largura
-- **Opacidade:** Aplicada automaticamente (20-30%)
-
-### **4️⃣ FAÇA O UPLOAD:**
-1. Copie os 3 arquivos PNG para dentro da pasta `/public/`
-2. Certifique-se que os nomes estão **EXATAMENTE** iguais aos listados acima
-3. Salve e faça commit/push para o repositório
-
-### **5️⃣ DEPLOY:**
-- Se estiver usando Vercel, o deploy será automático após o push
-- As imagens aparecerão automaticamente após o deploy
 
 ---
 
