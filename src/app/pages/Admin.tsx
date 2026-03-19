@@ -708,7 +708,7 @@ export default function Admin() {
                         type="file"
                         id="images"
                         multiple
-                        accept="image/*,video/*"
+                        accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
                       />
