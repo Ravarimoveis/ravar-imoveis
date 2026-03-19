@@ -10,7 +10,7 @@
 
 @media (max-width: 640px) {
   .featured-properties-carousel {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 }
 
@@ -49,11 +49,20 @@
   display: none;
 }
 
-/* Esconder setas no mobile */
+/* Setas no mobile - menores e dentro do container */
 @media (max-width: 640px) {
   .featured-properties-carousel .slick-prev,
   .featured-properties-carousel .slick-next {
-    display: none !important;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .featured-properties-carousel .slick-prev {
+    left: 10px;
+  }
+  
+  .featured-properties-carousel .slick-next {
+    right: 10px;
   }
 }
 
@@ -101,7 +110,7 @@
   background: rgba(175, 144, 66, 0.5);
 }
 
-/* Slide interno - FORÇAR LARGURA TOTAL NO MOBILE */
+/* Slide interno - efeitos visuais apenas no desktop */
 .featured-properties-carousel .slick-slide {
   opacity: 0.6;
   transform: scale(0.95);
@@ -125,14 +134,13 @@
 }
 
 /* ===================================================
-   MOBILE: 1 SLIDE POR VEZ COM 100% DE LARGURA
+   MOBILE: REMOVER EFEITOS E DEIXAR SLICK CONTROLAR
    =================================================== */
 @media (max-width: 640px) {
-  /* Remove todos os efeitos visuais no mobile */
+  /* Remove efeitos visuais no mobile */
   .featured-properties-carousel .slick-slide {
     opacity: 1 !important;
     transform: scale(1) !important;
-    transition: none !important;
   }
   
   .featured-properties-carousel .slick-slide.slick-active {
@@ -140,46 +148,9 @@
     transform: scale(1) !important;
   }
   
-  /* Container principal do slider */
-  .featured-properties-carousel .slick-slider {
-    width: 100% !important;
-  }
-  
-  /* Lista de slides */
-  .featured-properties-carousel .slick-list {
-    overflow: hidden !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-  }
-  
-  /* Track (container dos slides) - PERMITIR QUE O SLICK CONTROLE A LARGURA E TRANSFORM */
-  .featured-properties-carousel .slick-track {
-    display: flex !important;
-  }
-  
-  /* Cada slide individual deve ocupar 100% da largura do container */
-  .featured-properties-carousel .slick-slide {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    flex: 0 0 100% !important;
-    float: none !important;
-    display: block !important;
-  }
-  
-  /* Wrapper interno do slide (div criado pelo React Slick) */
+  /* Padding mínimo */
   .featured-properties-carousel .slick-slide > div {
-    width: 100% !important;
-    padding: 0 !important;
-    display: block !important;
-  }
-  
-  /* Container do PropertyCard */
-  .featured-properties-carousel .slick-slide > div > div {
-    width: 100% !important;
-    max-width: 100% !important;
-    display: block !important;
+    padding: 0 4px;
   }
 }
 
