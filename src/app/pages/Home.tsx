@@ -685,7 +685,7 @@ export function Home() {
                 ]}
               >
                 {properties.map(prop => (
-                  <div key={prop.id} className="px-0">
+                  <div key={prop.id}>
                     <PropertyCard prop={prop} onNavigate={() => navigate(`/imovel/${prop.id}`)} />
                   </div>
                 ))}
