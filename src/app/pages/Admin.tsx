@@ -17,6 +17,22 @@ import { MOCK_PROPERTIES } from '../data/properties';
 
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-e68c254a`;
 
+// Helper function to extract YouTube video ID and get thumbnail
+const getYouTubeThumbnail = (url: string): string | null => {
+  if (!url) return null;
+  
+  try {
+    const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/)?.[1];
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    }
+  } catch (error) {
+    console.error('Error extracting YouTube thumbnail:', error);
+  }
+  
+  return null;
+};
+
 export default function Admin() {
   const navigate = useNavigate();
   const { properties, loading, createProperty, updateProperty, deleteProperty, uploadImage, refresh } = useProperties();
@@ -24,7 +40,6 @@ export default function Admin() {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [uploading, setUploading] = useState(false);
   const [verifyingAuth, setVerifyingAuth] = useState(true);
-  const [cleaningData, setCleaningData] = useState(false);
 
   // FORMDATA DECLARATION - MUST BE BEFORE ANY USEEFFECT THAT USES IT
   const [formData, setFormData] = useState<Partial<Property>>({
@@ -46,6 +61,8 @@ export default function Admin() {
     neighborhood: '',
     image: '',
     images: [],
+    videoUrl: '',
+    videoUrls: [],
     description: '',
     petPolicy: '',
     features: [],
@@ -53,7 +70,6 @@ export default function Admin() {
     conveniences: [],
     lifeAround: [],
     location_details: ''
-    videoUrl: ''
   });
 
   // Check authentication on mount (frontend-only)
@@ -105,44 +121,6 @@ export default function Admin() {
     navigate('/admin/login');
   };
 
-  const handleCleanupMockData = async () => {
-    if (!confirm('Tem certeza que deseja deletar TODOS os imóveis mockados? Esta ação não pode ser desfeita!')) {
-      return;
-    }
-
-    const keepIds = prompt('Digite os IDs dos imóveis que deseja MANTER (separados por vírgula, ou deixe vazio para deletar tudo):');
-    const keepIdsArray = keepIds ? keepIds.split(',').map(id => id.trim()) : [];
-
-    setCleaningData(true);
-
-    try {
-      const token = localStorage.getItem('admin_access_token');
-      
-      const response = await fetch(`${API_BASE}/properties/cleanup/mock-data`, {
-        method: 'DELETE',
-        headers: {
-          'X-Admin-Token': token || '', // Use custom header instead of Authorization
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ keepIds: keepIdsArray })
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Erro ao limpar dados');
-      }
-
-      toast.success(result.message);
-      refresh();
-    } catch (error) {
-      console.error('Error cleaning up data:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao limpar dados');
-    } finally {
-      setCleaningData(false);
-    }
-  };
-
   const handleOpenDialog = (property?: Property) => {
     console.log('=== OPENING DIALOG ===');
     console.log('Property to edit:', property);
@@ -166,6 +144,7 @@ export default function Admin() {
       // CRITICAL FIX: Deep clone and ensure proper structure
       const formDataToSet = {
         ...property,
+        videoUrl: property.videoUrl || '',
         conveniences: Array.isArray(property.conveniences) 
           ? property.conveniences.map((item: any, idx: number) => ({
               id: item?.id || idx + 1,
@@ -191,7 +170,7 @@ export default function Admin() {
     } else {
       setEditingProperty(null);
       const newFormData = {
-        id: `RAVA-${String(properties.length + 11).padStart(3, '0')}`,
+        id: `RAVAR-${String(properties.length + 1).padStart(3, '0')}`,
         title: '',
         type: 'Venda' as const,
         category: 'Residencial',
@@ -209,6 +188,8 @@ export default function Admin() {
         neighborhood: '',
         image: '',
         images: [],
+        videoUrl: '',
+        videoUrls: [],
         description: '',
         petPolicy: '',
         features: [],
@@ -339,8 +320,8 @@ export default function Admin() {
   }
 
   return (
-    <div className="dark min-h-screen bg-[#0A1929] text-white pt-24 p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#0A1929] to-[#1a2942] pt-32 pb-20 px-4">
+      <div className="container mx-auto">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 lg:gap-0 mb-6 md:mb-8 sticky top-20 bg-[#0A1929] z-40 py-4 -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#AF9042] mb-2">Painel Administrativo RAVAR</h1>
@@ -357,35 +338,14 @@ export default function Admin() {
               <span className="hidden sm:inline">Gerenciar Seções</span>
               <span className="sm:hidden">Seções</span>
             </Button>
-
-            <Button 
-              onClick={handleCleanupMockData}
-              disabled={cleaningData}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm"
-            >
-              {cleaningData ? (
-                <>
-                  <Loader2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 animate-spin" />
-                  <span className="hidden sm:inline">Limpando...</span>
-                  <span className="sm:hidden">...</span>
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                  <span className="hidden sm:inline">Limpar Dados Mockados</span>
-                  <span className="sm:hidden">Limpar</span>
-                </>
-              )}
-            </Button>
             
             <Button 
               onClick={handleLogout}
               variant="outline"
-              className="border-gray-600 !text-white hover:bg-gray-700 hover:!text-white hover:border-gray-500 text-xs md:text-sm"
-              style={{ color: 'white !important' }}
+              className="border-red-600 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white hover:border-red-600 text-xs md:text-sm"
             >
-              <LogOut className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" style={{ color: 'white' }} />
-              <span style={{ color: 'white' }}>Sair</span>
+              <LogOut className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              Sair
             </Button>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -410,31 +370,31 @@ export default function Admin() {
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-                  {/* ID e Título */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="id">ID do Imóvel</Label>
-                      <Input
-                        id="id"
-                        value={formData.id}
-                        onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                        placeholder="RAVA-XXX"
-                        disabled={!!editingProperty}
-                        className="bg-[#1a2332] border-gray-700"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="title">Título</Label>
-                      <Input
-                        id="title"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="Ex: Mansão Exclusiva Cidade Jardim"
-                        className="bg-[#1a2332] border-gray-700"
-                        required
-                      />
-                    </div>
+                  {/* ID */}
+                  <div>
+                    <Label htmlFor="id">ID do Imóvel</Label>
+                    <Input
+                      id="id"
+                      value={formData.id}
+                      onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                      placeholder="RAVAR-XXX"
+                      disabled={!!editingProperty}
+                      className="bg-[#1a2332] border-gray-700"
+                      required
+                    />
+                  </div>
+
+                  {/* Título - Campo como Textarea */}
+                  <div>
+                    <Label htmlFor="title" className="text-[#AF9042] font-semibold">Título do Imóvel</Label>
+                    <Textarea
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Ex: Mansão Exclusiva Cidade Jardim"
+                      className="bg-[#1a2332] border-gray-700 min-h-[80px] text-sm"
+                      required
+                    />
                   </div>
 
                   {/* Tipo e Categoria */}
@@ -489,9 +449,16 @@ export default function Admin() {
                       <Label htmlFor="price">Preço (R$)</Label>
                       <Input
                         id="price"
-                        type="number"
-                        value={formData.price}
-                        onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.price || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, price: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
                         placeholder="0 = Sob Consulta"
                         className="bg-[#1a2332] border-gray-700"
                       />
@@ -500,9 +467,17 @@ export default function Admin() {
                       <Label htmlFor="condo">Condomínio (R$)</Label>
                       <Input
                         id="condo"
-                        type="number"
-                        value={formData.condo}
-                        onChange={(e) => setFormData({ ...formData, condo: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.condo || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, condo: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -510,9 +485,17 @@ export default function Admin() {
                       <Label htmlFor="iptu">IPTU (R$)</Label>
                       <Input
                         id="iptu"
-                        type="number"
-                        value={formData.iptu}
-                        onChange={(e) => setFormData({ ...formData, iptu: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.iptu || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, iptu: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -524,9 +507,17 @@ export default function Admin() {
                       <Label htmlFor="area">Área (m²)</Label>
                       <Input
                         id="area"
-                        type="number"
-                        value={formData.area}
-                        onChange={(e) => setFormData({ ...formData, area: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.area || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, area: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="Ex: 250"
                         className="bg-[#1a2332] border-gray-700"
                         required
                       />
@@ -535,9 +526,17 @@ export default function Admin() {
                       <Label htmlFor="landArea">Terreno (m²)</Label>
                       <Input
                         id="landArea"
-                        type="number"
-                        value={formData.landArea}
-                        onChange={(e) => setFormData({ ...formData, landArea: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.landArea || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, landArea: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -560,9 +559,17 @@ export default function Admin() {
                       <Label htmlFor="rooms">Quartos</Label>
                       <Input
                         id="rooms"
-                        type="number"
-                        value={formData.rooms}
-                        onChange={(e) => setFormData({ ...formData, rooms: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.rooms || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, rooms: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -570,9 +577,17 @@ export default function Admin() {
                       <Label htmlFor="suites">Suítes</Label>
                       <Input
                         id="suites"
-                        type="number"
-                        value={formData.suites}
-                        onChange={(e) => setFormData({ ...formData, suites: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.suites || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, suites: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -580,9 +595,17 @@ export default function Admin() {
                       <Label htmlFor="baths">Banheiros</Label>
                       <Input
                         id="baths"
-                        type="number"
-                        value={formData.baths}
-                        onChange={(e) => setFormData({ ...formData, baths: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.baths || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, baths: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -590,9 +613,17 @@ export default function Admin() {
                       <Label htmlFor="parking">Vagas</Label>
                       <Input
                         id="parking"
-                        type="number"
-                        value={formData.parking}
-                        onChange={(e) => setFormData({ ...formData, parking: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.parking || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          setFormData({ ...formData, parking: value ? Number(value) : 0 });
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                        }}
+                        placeholder="0"
                         className="bg-[#1a2332] border-gray-700"
                       />
                     </div>
@@ -609,6 +640,71 @@ export default function Admin() {
                       className="bg-[#1a2332] border-gray-700 min-h-[100px]"
                       required
                     />
+                  </div>
+
+                  {/* Vídeos do YouTube - Múltiplos */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label>Vídeos do YouTube</Label>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const newVideos = [...(formData.videoUrls || []), ''];
+                          setFormData({ ...formData, videoUrls: newVideos });
+                        }}
+                        className="bg-[#AF9042] hover:bg-[#8f7635] text-white text-xs"
+                      >
+                        <Plus className="w-3 h-3 mr-1" />
+                        Adicionar Vídeo
+                      </Button>
+                    </div>
+                    
+                    {/* Vídeo Principal (Compatibilidade retroativa) */}
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          type="url"
+                          value={formData.videoUrl || ''}
+                          onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                          placeholder="Vídeo principal: https://www.youtube.com/watch?v=..."
+                          className="bg-[#1a2332] border-gray-700 flex-1"
+                        />
+                      </div>
+                      
+                      {/* Vídeos Adicionais */}
+                      {formData.videoUrls && formData.videoUrls.length > 0 && (
+                        <div className="space-y-2 mt-3">
+                          <Label className="text-xs text-gray-400">Vídeos Adicionais:</Label>
+                          {formData.videoUrls.map((url, index) => (
+                            <div key={index} className="flex gap-2">
+                              <Input
+                                type="url"
+                                value={url}
+                                onChange={(e) => {
+                                  const newVideos = [...(formData.videoUrls || [])];
+                                  newVideos[index] = e.target.value;
+                                  setFormData({ ...formData, videoUrls: newVideos });
+                                }}
+                                placeholder={`Vídeo ${index + 2}: https://www.youtube.com/watch?v=...`}
+                                className="bg-[#1a2332] border-gray-700 flex-1"
+                              />
+                              <Button
+                                type="button"
+                                onClick={() => {
+                                  const newVideos = formData.videoUrls?.filter((_, i) => i !== index);
+                                  setFormData({ ...formData, videoUrls: newVideos });
+                                }}
+                                variant="destructive"
+                                className="px-3"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Cole os links completos dos vídeos do YouTube (suporta vídeos normais e Shorts)</p>
                   </div>
 
                   {/* Características do Imóvel (Features) */}
@@ -709,7 +805,7 @@ export default function Admin() {
                         type="file"
                         id="images"
                         multiple
-                        accept="image/*,video/*"
+                        accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
                       />
@@ -808,70 +904,62 @@ export default function Admin() {
 
         {/* Lista de Imóveis */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {properties.map((property) => (
-            <Card key={property.id} className="bg-[#1a2332] border-gray-700 overflow-hidden">
-              <div className="relative h-48">
-                <img 
-                  src={property.image} 
-                  alt={property.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2 right-2 bg-[#AF9042] text-white px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-semibold">
-                  {property.id}
+          {properties.map((property) => {
+            // Se não tiver imagem, tenta pegar thumbnail do YouTube
+            const displayImage = property.image || getYouTubeThumbnail(property.videoUrl || '') || '/placeholder-property.jpg';
+            
+            return (
+              <Card key={property.id} className="bg-[#1a2332] border-gray-700 overflow-hidden">
+                <div className="relative h-48">
+                  <img 
+                    src={displayImage} 
+                    alt={property.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2 bg-[#AF9042] text-white px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-semibold">
+                    {property.id}
+                  </div>
                 </div>
-              </div>
-              <div className="p-3 md:p-4">
-                <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2 line-clamp-1">{property.title}</h3>
-                <p className="text-gray-400 text-xs md:text-sm mb-1 md:mb-2">{property.neighborhood}</p>
-                <p className="text-[#AF9042] font-bold mb-3 md:mb-4 text-sm md:text-base">
-                  {property.price > 0 
-                    ? property.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                    : 'Sob Consulta'
-                  }
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button
-                    onClick={() => handleOpenDialog(property)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2"
-                  >
-                    <Edit className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Editar
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(property.id)}
-                    variant="destructive"
-                    className="flex-1 text-xs md:text-sm py-2"
-                  >
-                    <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Deletar
-                  </Button>
-                  <Button
-                    onClick={() => handleResetToMock(property.id)}
-                    variant="outline"
-                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-xs md:text-sm py-2"
-                  >
-                    <RefreshCw className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    Resetar
-                  </Button>
+                <div className="p-3 md:p-4">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2 line-clamp-1">{property.title}</h3>
+                  <p className="text-gray-400 text-xs md:text-sm mb-1 md:mb-2">{property.neighborhood}</p>
+                  <p className="text-[#AF9042] font-bold mb-3 md:mb-4 text-sm md:text-base">
+                    {property.price > 0 
+                      ? property.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                      : 'Sob Consulta'
+                    }
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      onClick={() => handleOpenDialog(property)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2"
+                    >
+                      <Edit className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                      Editar
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(property.id)}
+                      variant="destructive"
+                      className="flex-1 text-xs md:text-sm py-2"
+                    >
+                      <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                      Deletar
+                    </Button>
+                    <Button
+                      onClick={() => handleResetToMock(property.id)}
+                      variant="outline"
+                      className="flex-1 bg-gray-600 hover:bg-gray-700 text-white text-xs md:text-sm py-2"
+                    >
+                      <RefreshCw className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                      Resetar
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
   );
 }
-
-{/* video youtube */}
-<div>
-  <Label htmlFor="videoUrl">Link do Vídeo (YouTube)</Label>
-  <Input
-    id="videoUrl"
-    value={formData.videoUrl || ''}
-    onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-    placeholder="Ex: https://www.youtube.com/watch?v=..."
-    className="bg-[#1a2332] border-gray-700"
-  />
-  <p className="text-xs text-gray-500 mt-1">Cole aqui o link do vídeo que você subiu.</p>
-</div>

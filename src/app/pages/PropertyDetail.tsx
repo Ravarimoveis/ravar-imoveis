@@ -62,11 +62,49 @@ export function PropertyDetail() {
 
   const isAluguel = property.type === 'Aluguel';
   const totalValue = isAluguel ? (property.price + (property.condo || 0) + (property.iptu || 0)) : property.price;
+  
+  // Função para extrair o ID do vídeo do YouTube
+  const getYouTubeID = (url: string) => {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)|(shorts\/))\\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[8].length === 11) ? match[8] : null;
+  };
+
+  const videoId = property.videoUrl ? getYouTubeID(property.videoUrl) : null;
+  
+  // Criar array de mídia (vídeo + imagens)
   const hasGallery = property.images && property.images.length > 0;
-  const displayImages = hasGallery ? property.images : [property.image];
+  const mediaItems: Array<{ type: 'video' | 'image', content: string }> = [];
+  
+  // Se tem vídeo principal, adiciona como primeiro item
+  if (videoId) {
+    mediaItems.push({ type: 'video', content: videoId });
+  }
+  
+  // Adiciona vídeos adicionais do array videoUrls
+  if (property.videoUrls && Array.isArray(property.videoUrls)) {
+    property.videoUrls.forEach(url => {
+      if (url) {
+        const additionalVideoId = getYouTubeID(url);
+        if (additionalVideoId) {
+          mediaItems.push({ type: 'video', content: additionalVideoId });
+        }
+      }
+    });
+  }
+  
+  // Adiciona as imagens
+  if (hasGallery) {
+    property.images.forEach(img => mediaItems.push({ type: 'image', content: img }));
+  } else if (property.image) {
+    mediaItems.push({ type: 'image', content: property.image });
+  }
+  
+  const hasMedia = mediaItems.length > 0;
+  const totalPhotos = mediaItems.filter(m => m.type === 'image').length;
 
   const openWhatsAppInfo = () => {
-    const msg = encodeURIComponent(`Olá! Vi o imóvel *${property.title}* (Ref: ${property.id}) no site da RAVAR Imóveis e gostaria de saber mais informações sobre este imóvel. Aguardo retorno!`);
+    const msg = encodeURIComponent(`Olá! Vi o imvel *${property.title}* (Ref: ${property.id}) no site da RAVAR Imóveis e gostaria de saber mais informações sobre este imóvel. Aguardo retorno!`);
     window.open(`https://api.whatsapp.com/send?phone=5511972013159&text=${msg}`, '_blank');
   };
 
@@ -76,7 +114,7 @@ export function PropertyDetail() {
   };
 
   return (
-    <div className="pt-32 pb-24 animate-in slide-in-from-bottom-4 duration-1000 bg-white">
+    <div className="pt-40 pb-24 animate-in slide-in-from-bottom-4 duration-1000 bg-white">
       <div className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 text-left">
         
         <div className="flex flex-col md:flex-row justify-between items-start mb-12 md:mb-16 gap-6 md:gap-8 text-left">
@@ -95,69 +133,107 @@ export function PropertyDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20 items-start text-left">
           
           <div className="lg:col-span-8 text-left">
+            {/* Badges de Fotos e Vídeo - ACIMA do carrossel - MOBILE OPTIMIZED */}
+            {hasMedia && (
+              <div className="flex flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
+                {totalPhotos > 0 && (
+                  <div className="bg-white/90 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-[8px] sm:text-[9px] md:text-[10px] font-light uppercase tracking-[0.2em] sm:tracking-[0.25em] md:tracking-[0.3em] text-[#0A1929] shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 border border-gray-100 rounded-sm">
+                    <ImageIcon size={12} className="sm:w-[13px] sm:h-[13px] md:w-[14px] md:h-[14px] text-[#AF9042]" /> {totalPhotos} {totalPhotos > 1 ? 'Fotos' : 'Foto'}
+                  </div>
+                )}
+                {videoId && (
+                  <div className="bg-white/90 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-[8px] sm:text-[9px] md:text-[10px] font-light uppercase tracking-[0.2em] sm:tracking-[0.25em] md:tracking-[0.3em] text-[#0A1929] shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 border border-gray-100 rounded-sm">
+                    <Play size={12} className="sm:w-[13px] sm:h-[13px] md:w-[14px] md:h-[14px] text-[#AF9042]" /> Video
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="mb-8 md:mb-12 group relative overflow-hidden rounded-sm shadow-xl">
-               <LazyImage 
-                 src={displayImages[selectedImage]} 
-                 className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[650px] object-cover transition-all duration-[3s] group-hover:scale-105" 
-                 alt={property.title} 
-                 onLoad={() => setMainImageLoaded(true)}
-               />
-               
-               {/* ✅ MARCA D'ÁGUA AUTOMÁTICA - IMAGEM OU FALLBACK */}
-               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                 {marcaDaguaError ? (
-                   <MarcaDaguaPlaceholder className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20" />
-                 ) : (
-                   <img 
-                     src={marcaDagua} 
-                     alt="" 
-                     className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20 select-none"
-                     onError={() => setMarcaDaguaError(true)}
+               {/* Renderiza vídeo OU imagem */}
+               {mediaItems[selectedImage]?.type === 'video' ? (
+                 <div className="relative w-full aspect-video bg-black">
+                   <iframe
+                     className="absolute top-0 left-0 w-full h-full"
+                     src={`https://www.youtube.com/embed/${mediaItems[selectedImage].content}`}
+                     title="Vídeo do Imóvel"
+                     frameBorder="0"
+                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                     allowFullScreen
                    />
-                 )}
-               </div>
-               
-               <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 md:bottom-10 md:left-10 flex flex-col sm:flex-row gap-2 sm:gap-4">
-                 <button className="bg-white/90 backdrop-blur-md px-4 sm:px-6 md:px-10 py-3 md:py-4 text-[9px] sm:text-[10px] font-light uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[#0A1929] hover:bg-[#0A1929] hover:text-white transition-all shadow-2xl flex items-center justify-center gap-2 sm:gap-3 border border-white/50">
-                   <ImageIcon size={14} className="text-[#AF9042]" /> {displayImages.length} Fotos
-                 </button>
-                 <button className="bg-white/90 backdrop-blur-md px-4 sm:px-6 md:px-10 py-3 md:py-4 text-[9px] sm:text-[10px] font-light uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[#0A1929] hover:bg-[#0A1929] hover:text-white transition-all shadow-2xl flex items-center justify-center gap-2 sm:gap-3 border border-white/50">
-                   <Play size={14} className="text-[#AF9042]" /> Vídeo
-                 </button>
-               </div>
+                 </div>
+               ) : (
+                 <>
+                   <LazyImage 
+                     src={mediaItems[selectedImage]?.content || ''} 
+                     className="w-full h-[350px] sm:h-[450px] md:h-[550px] lg:h-[650px] object-cover transition-all duration-[3s] group-hover:scale-105" 
+                     alt={property.title} 
+                     onLoad={() => setMainImageLoaded(true)}
+                   />
+                   
+                   {/* ✅ MARCA D'ÁGUA AUTOMÁTICA - IMAGEM OU FALLBACK */}
+                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                     {marcaDaguaError ? (
+                       <MarcaDaguaPlaceholder className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20" />
+                     ) : (
+                       <img 
+                         src={marcaDagua} 
+                         alt="" 
+                         className="w-[75%] sm:w-[67%] md:w-[60%] lg:w-[52%] opacity-20 select-none"
+                         onError={() => setMarcaDaguaError(true)}
+                       />
+                     )}
+                   </div>
+                 </>
+               )}
             </div>
 
-            {hasGallery && displayImages.length > 1 && (
-              <div className="mb-12 overflow-x-auto">
-                <div className="flex gap-4 pb-4">
-                  {displayImages.map((img, idx) => (
+            {mediaItems.length > 1 && (
+              <div className="mb-8 sm:mb-10 md:mb-12 overflow-x-auto scrollbar-hide">
+                <div className="flex gap-2 sm:gap-3 md:gap-4 pb-2 sm:pb-3 md:pb-4 min-w-max">
+                  {mediaItems.map((item, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`flex-shrink-0 w-32 h-24 rounded-sm overflow-hidden border-2 transition-all relative ${
+                      className={`flex-shrink-0 w-20 h-16 sm:w-24 sm:h-18 md:w-32 md:h-24 rounded-sm overflow-hidden border-2 transition-all relative ${
                         selectedImage === idx ? 'border-[#AF9042] scale-105' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <LazyImage 
-                        src={img} 
-                        loading="lazy"
-                        className="w-full h-full object-cover" 
-                        alt={`${property.title} - ${idx + 1}`} 
-                      />
-                      
-                      {/* ✅ MARCA D'ÁGUA AUTOMÁTICA NAS THUMBNAILS */}
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        {marcaDaguaError ? (
-                          <MarcaDaguaPlaceholder className="w-full opacity-30" />
-                        ) : (
+                      {item.type === 'video' ? (
+                        <>
                           <img 
-                            src={marcaDagua} 
-                            alt="" 
-                            className="w-full opacity-30 select-none"
-                            onError={() => setMarcaDaguaError(true)}
+                            src={`https://img.youtube.com/vi/${item.content}/mqdefault.jpg`}
+                            className="w-full h-full object-cover" 
+                            alt="Thumbnail do vídeo" 
                           />
-                        )}
-                      </div>
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <Play size={24} className="sm:w-[28px] sm:h-[28px] md:w-[32px] md:h-[32px] text-white" fill="white" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <LazyImage 
+                            src={item.content} 
+                            loading="lazy"
+                            className="w-full h-full object-cover" 
+                            alt={`${property.title} - ${idx + 1}`} 
+                          />
+                          
+                          {/* ✅ MARCA D'ÁGUA AUTOMÁTICA NAS THUMBNAILS */}
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            {marcaDaguaError ? (
+                              <MarcaDaguaPlaceholder className="w-full opacity-30" />
+                            ) : (
+                              <img 
+                                src={marcaDagua} 
+                                alt="" 
+                                className="w-full opacity-30 select-none"
+                                onError={() => setMarcaDaguaError(true)}
+                              />
+                            )}
+                          </div>
+                        </>
+                      )}
                     </button>
                   ))}
                 </div>

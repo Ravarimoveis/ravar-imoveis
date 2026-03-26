@@ -304,292 +304,100 @@ app.delete("/make-server-e68c254a/properties/:id/images/:filename", async (c) =>
   }
 });
 
-// ==================== ADMIN AUTH ENDPOINTS ====================
-
-// Hardcoded admin credentials (simple and secure)
-const ADMIN_USERS = {
-  'fernando@g2g.org.br': {
-    password: 'ravar2024fernando',
-    name: 'Fernando'
-  },
-  'rafaelvrodriguesp@gmail.com': {
-    password: 'ravar2024rafael',
-    name: 'Rafael'
-  }
-};
-
-// POST admin login (simple password check)
-app.post("/make-server-e68c254a/admin/login", async (c) => {
+// ==================== MIGRATION ENDPOINT ====================
+// MIGRATE property codes from RAVA-XXX to RAVAR-XXX
+app.post("/make-server-e68c254a/migrate-property-codes", async (c) => {
   try {
-    const body = await c.req.json();
-    const { email, password } = body;
-
-    console.log('=== Admin Login Request ===');
-    console.log('Email:', email);
-
-    if (!email || !password) {
-      return c.json({ success: false, error: 'Email e senha são obrigatórios' }, 400);
-    }
-
-    // Check if email exists and password matches
-    const user = ADMIN_USERS[email.toLowerCase() as keyof typeof ADMIN_USERS];
+    console.log('🔄 Starting property code migration from RAVA-XXX to RAVAR-XXX');
     
-    if (!user) {
-      console.log('Email not found in ADMIN_USERS');
-      return c.json({ success: false, error: 'Email não autorizado' }, 403);
-    }
-
-    if (user.password !== password) {
-      console.log('Password mismatch');
-      return c.json({ 
-        success: false, 
-        error: 'Senha incorreta' 
-      }, 401);
-    }
-
-    // Generate a SIMPLE token - just email:timestamp (no encoding!)
-    const token = `${email}:${Date.now()}`;
-    
-    console.log('Generated token:', token);
-    console.log('Login successful for:', email);
-
-    return c.json({ 
-      success: true, 
-      data: {
-        access_token: token,
-        user: {
-          email: email,
-          name: user.name
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error during admin login:', error);
-    return c.json({ success: false, error: String(error) }, 500);
-  }
-});
-
-// POST verify admin session
-app.post("/make-server-e68c254a/admin/verify", async (c) => {
-  console.log('========================================');
-  console.log('=== ADMIN VERIFY REQUEST STARTED ===');
-  console.log('========================================');
-  
-  try {
-    // Get token from request BODY instead of headers to avoid CORS issues
-    const body = await c.req.json();
-    const accessToken = body.token;
-    
-    console.log('Token from request body:', accessToken);
-    
-    if (!accessToken) {
-      console.log('❌ ERROR: No token provided in request body');
-      return c.json({ success: false, error: 'Token não fornecido' }, 401);
-    }
-
-    console.log('✅ Access token received:', accessToken);
-
-    // Extract email from token (format: email:timestamp - NO ENCODING!)
-    let email: string;
-    try {
-      const parts = accessToken.split(':');
-      console.log('Token split into parts:', parts);
-      email = parts[0];
-      console.log('✅ Extracted email:', email);
-    } catch (err) {
-      console.log('❌ Error parsing token:', err);
-      return c.json({ success: false, error: 'Token inválido' }, 401);
-    }
-
-    // Check if user exists
-    const emailLower = email.toLowerCase();
-    console.log('Looking up user with email:', emailLower);
-    console.log('Available admin emails:', Object.keys(ADMIN_USERS));
-    
-    const user = ADMIN_USERS[emailLower as keyof typeof ADMIN_USERS];
-    console.log('User lookup result:', user ? '✅ FOUND' : '❌ NOT FOUND');
-    
-    if (!user) {
-      console.log('❌ User not found in ADMIN_USERS');
-      return c.json({ success: false, error: 'Acesso não autorizado' }, 403);
-    }
-
-    console.log('========================================');
-    console.log('✅✅✅ VERIFICATION SUCCESSFUL ✅✅✅');
-    console.log('Email:', email);
-    console.log('Name:', user.name);
-    console.log('========================================');
-    
-    return c.json({ 
-      success: true, 
-      data: {
-        user: {
-          email: email,
-          name: user.name
-        }
-      }
-    });
-  } catch (error) {
-    console.log('========================================');
-    console.error('❌❌❌ FATAL ERROR IN VERIFY ❌❌❌');
-    console.error('Error details:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
-    console.log('========================================');
-    return c.json({ success: false, error: String(error) }, 500);
-  }
-});
-
-// ==================== DATA CLEANUP ENDPOINTS ====================
-
-// DELETE all mock properties (properties that don't match recent pattern)
-app.delete("/make-server-e68c254a/properties/cleanup/mock-data", async (c) => {
-  try {
-    // Get auth token from custom header
-    const accessToken = c.req.header('X-Admin-Token');
-    
-    if (!accessToken) {
-      return c.json({ success: false, error: 'Não autorizado' }, 401);
-    }
-
-    // Verify admin user with our simple auth (NO atob - just split!)
-    let email: string;
-    try {
-      const parts = accessToken.split(':');
-      email = parts[0];
-    } catch {
-      return c.json({ success: false, error: 'Token inválido' }, 401);
-    }
-
-    const user = ADMIN_USERS[email.toLowerCase() as keyof typeof ADMIN_USERS];
-    if (!user) {
-      return c.json({ success: false, error: 'Acesso não autorizado' }, 403);
-    }
-
     // Get all properties
-    const allProperties = await kv.getByPrefix('property:');
+    const properties = await kv.getByPrefix('property:');
+    console.log(`📦 Found ${properties.length} properties to migrate`);
     
-    // Get IDs to keep from request body (optional)
-    const body = await c.req.json().catch(() => ({}));
-    const keepIds: string[] = body.keepIds || [];
+    const migrations = [];
     
-    const deletedIds: string[] = [];
-    const keptIds: string[] = [];
+    // Sort properties by ID to ensure consistent numbering
+    const sortedProperties = properties.sort((a, b) => a.id.localeCompare(b.id));
     
-    for (const property of allProperties) {
-      // Keep properties in keepIds list
-      if (keepIds.includes(property.id)) {
-        keptIds.push(property.id);
-        continue;
-      }
+    for (let i = 0; i < sortedProperties.length; i++) {
+      const property = sortedProperties[i];
+      const oldId = property.id;
       
-      // Delete the property
-      await kv.del(`property:${property.id}`);
-      deletedIds.push(property.id);
+      // Generate new ID: RAVAR-001, RAVAR-002, etc.
+      const newId = `RAVAR-${String(i + 1).padStart(3, '0')}`;
+      
+      console.log(`🔄 Migrating ${oldId} → ${newId}`);
+      
+      // Update property with new ID
+      const updatedProperty = { ...property, id: newId };
+      
+      // Delete old key
+      await kv.del(`property:${oldId}`);
+      
+      // Set with new key
+      await kv.set(`property:${newId}`, updatedProperty);
+      
+      migrations.push({ oldId, newId });
     }
-
+    
+    console.log('✅ Migration completed successfully');
+    
     return c.json({ 
       success: true, 
-      data: {
-        deleted: deletedIds.length,
-        kept: keptIds.length,
-        deletedIds,
-        keptIds
-      },
-      message: `${deletedIds.length} imóveis mockados deletados. ${keptIds.length} imóveis mantidos.`
+      message: `Successfully migrated ${migrations.length} properties`,
+      migrations 
     });
   } catch (error) {
-    console.error('Error cleaning up mock data:', error);
+    console.error('❌ Error during migration:', error);
     return c.json({ success: false, error: String(error) }, 500);
   }
 });
 
-// ==================== SECTIONS CONFIG ENDPOINTS ====================
+// ==================== SECTIONS CONFIGURATION ENDPOINTS ====================
 
-// GET sections config (PUBLIC - no auth required)
+// GET sections configuration
 app.get("/make-server-e68c254a/sections/config", async (c) => {
   try {
-    // Get config from KV store (no auth required for reading)
     const config = await kv.get('sections:config');
     
-    // Return config or default values
-    return c.json({ 
-      success: true, 
-      config: config || {
+    // Return default config if none exists
+    if (!config) {
+      const defaultConfig = {
         neighborhoodsEnabled: true,
         neighborhoodsTitle: 'Explore por bairros',
         categoriesEnabled: true,
         categoriesTitle: 'Buscar por Categoria'
-      }
-    });
+      };
+      return c.json({ success: true, config: defaultConfig });
+    }
+    
+    return c.json({ success: true, config: config });
   } catch (error) {
     console.error('Error fetching sections config:', error);
     return c.json({ success: false, error: String(error) }, 500);
   }
 });
 
-// POST/PUT sections config (REQUIRES AUTH via body - same pattern as /admin/verify)
+// POST/UPDATE sections configuration
 app.post("/make-server-e68c254a/sections/config", async (c) => {
-  console.log('========================================');
-  console.log('=== SECTIONS CONFIG POST REQUEST ===');
-  console.log('========================================');
-  
   try {
-    // Get token from BODY (not headers) to avoid CORS issues
     const body = await c.req.json();
-    const accessToken = body.token;
-    const config = body.config;
+    const { config } = body;
     
-    console.log('Token from body:', accessToken ? 'Present' : 'Missing');
-    console.log('Config from body:', config ? 'Present' : 'Missing');
-    
-    if (!accessToken) {
-      console.log('❌ No token provided in body');
-      return c.json({ success: false, error: 'Não autorizado - Token ausente' }, 401);
-    }
-
     if (!config) {
-      console.log('❌ No config in body');
       return c.json({ success: false, error: 'Config is required' }, 400);
     }
-
-    // Verify admin user (same pattern as /admin/verify)
-    let email: string;
-    try {
-      const parts = accessToken.split(':');
-      email = parts[0];
-      console.log('✅ Token split successful - Email:', email);
-    } catch (err) {
-      console.log('❌ Error splitting token:', err);
-      return c.json({ success: false, error: 'Token inválido' }, 401);
-    }
-
-    const emailLower = email.toLowerCase();
-    console.log('Looking up user:', emailLower);
     
-    const user = ADMIN_USERS[emailLower as keyof typeof ADMIN_USERS];
+    console.log('💾 Saving sections config:', config);
     
-    if (!user) {
-      console.log('❌ User not found in ADMIN_USERS');
-      return c.json({ success: false, error: 'Acesso não autorizado' }, 403);
-    }
-
-    console.log('✅ User authenticated:', user.name);
-
-    // Save config to KV store
     await kv.set('sections:config', config);
-    
-    console.log('✅ Config saved successfully!');
-    console.log('Saved config:', JSON.stringify(config, null, 2));
-    console.log('========================================');
     
     return c.json({ 
       success: true, 
-      message: 'Configurações salvas com sucesso',
-      config
+      message: 'Configuration saved successfully'
     });
   } catch (error) {
-    console.error('❌ Error saving sections config:', error);
-    console.log('========================================');
+    console.error('Error saving sections config:', error);
     return c.json({ success: false, error: String(error) }, 500);
   }
 });

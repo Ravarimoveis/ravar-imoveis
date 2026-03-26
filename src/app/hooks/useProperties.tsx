@@ -23,6 +23,8 @@ export interface Property {
   neighborhood: string;
   image: string;
   images: string[];
+  videoUrl?: string;
+  videoUrls?: string[];
   description: string;
   petPolicy: string;
   features: string[];
@@ -281,37 +283,35 @@ export function useProperties() {
   };
 
   const uploadImage = async (file: File, propertyId: string) => {
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('propertyId', propertyId);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('propertyId', propertyId);
 
-    // Mantemos o link do servidor antigo para não quebrar a conexão
-    const response = await fetch(`${API_BASE}/upload-image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${publicAnonKey}`
-      },
-      body: formData
-    });
+      const response = await fetch(`${API_BASE}/upload-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${publicAnonKey}`
+        },
+        body: formData
+      });
 
-    if (!response.ok) {
-      // Mudamos a mensagem para 'arquivo' para ser genérico
-      throw new Error(`Erro ao subir arquivo: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Failed to upload image: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        return result.data.publicUrl;
+      } else {
+        throw new Error(result.error || 'Failed to upload image');
+      }
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      throw err;
     }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return result.data.publicUrl;
-    } else {
-      throw new Error(result.error || 'Falha no upload do arquivo');
-    }
-  } catch (err) {
-    console.error('Erro no upload:', err);
-    throw err;
-  }
-};
+  };
 
   return {
     properties,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, BedDouble, Bath, Car, Square } from 'lucide-react';
+import { Heart, BedDouble, Bath, Car, Square, Play } from 'lucide-react';
 import { LazyImage } from './LazyImage';
 import { MarcaDaguaPlaceholder } from './LogoPlaceholder';
 import { formatCurrency } from '../data/properties';
@@ -12,6 +12,13 @@ interface PropertyCardProps {
   onNavigate: () => void;
 }
 
+// Função para extrair o ID do vídeo do YouTube
+const getYouTubeID = (url: string) => {
+  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)|(shorts\/))\\??v?=?([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[8].length === 11) ? match[8] : null;
+};
+
 export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [marcaDaguaError, setMarcaDaguaError] = useState(false);
@@ -19,6 +26,13 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
   const totalValue = isAluguel ? (prop.price + (prop.condo || 0) + (prop.iptu || 0)) : prop.price;
   const priceDisplay = formatCurrency(totalValue);
   const isSobConsulta = priceDisplay === 'Sob Consulta';
+  
+  // Verificar se tem vídeo E não tem imagem
+  const videoId = prop.videoUrl ? getYouTubeID(prop.videoUrl) : null;
+  const showVideo = videoId && !prop.image && (!prop.images || prop.images.length === 0);
+  const displayImage = showVideo 
+    ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` 
+    : prop.image;
   
   return (
     <div className="group cursor-pointer text-left" onClick={onNavigate}>
@@ -31,7 +45,7 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
         
         {/* ✅ LAZY LOADING + FADE IN */}
         <LazyImage 
-          src={prop.image} 
+          src={displayImage} 
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
           className={`w-full h-full object-cover transition-all duration-[2s] group-hover:scale-105 ${
@@ -56,6 +70,11 @@ export function PropertyCard({ prop, onNavigate }: PropertyCardProps) {
         
         <div className="absolute top-6 left-6 flex gap-2">
           <span className="bg-white/90 backdrop-blur px-3 py-1 text-[8px] font-light uppercase tracking-widest text-[#0A1929] border border-gray-100">{prop.type}</span>
+          {videoId && (
+            <span className="bg-[#AF9042]/90 backdrop-blur px-2.5 sm:px-3 py-1 text-[7px] sm:text-[8px] font-light uppercase tracking-widest text-white border border-[#AF9042] flex items-center gap-1">
+              <Play size={9} className="sm:w-[10px] sm:h-[10px]" fill="white" /> Vídeo
+            </span>
+          )}
         </div>
         <div className="absolute top-5 right-5">
           <button className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-xl">

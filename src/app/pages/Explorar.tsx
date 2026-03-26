@@ -286,8 +286,8 @@ export function Explorar() {
   };
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen animate-in fade-in duration-1000">
-      <div className="container mx-auto px-10">
+    <div className="pt-40 pb-24 bg-white min-h-screen animate-in fade-in duration-1000">
+      <div className="container mx-auto px-4 sm:px-6 md:px-10">
         <div className="mb-12">
           <h1 className="text-5xl font-extralight text-[#0A1929] mb-6 tracking-tight">Explorar Imóveis</h1>
           <div className="flex flex-wrap gap-2 mb-4">

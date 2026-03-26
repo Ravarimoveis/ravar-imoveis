@@ -22,7 +22,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrolled || !isHome ? 'bg-white py-4 border-b border-gray-100 shadow-sm' : 'bg-transparent py-8'}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrolled || !isHome ? 'bg-white py-4 border-b border-gray-100 shadow-sm' : 'bg-[#0A1929] py-8'}`}>
         <div className="container mx-auto px-4 sm:px-6 md:px-10 flex justify-between items-center text-left">
           <Link to="/" className="flex items-center cursor-pointer group no-underline">
             {logoError ? (

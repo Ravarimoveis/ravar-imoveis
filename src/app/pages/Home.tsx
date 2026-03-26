@@ -233,7 +233,7 @@ export function Home() {
   };
 
   return (
-    <div className="animate-in fade-in duration-1000 text-left">
+    <div className="pt-24 animate-in fade-in duration-1000 text-left">
       {/* HERO SECTION */}
       <section className="relative h-[95vh] min-h-[750px] flex items-center justify-center bg-[#0A1929] text-left">
         <div className="container mx-auto px-10 relative z-10 text-left">
